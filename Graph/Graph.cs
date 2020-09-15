@@ -41,12 +41,12 @@ namespace Graph
         {
             foreach(var v in V)
             {
-                Console.Write(v+" ");
+                Console.Write(v.number+" ");
             }
             Console.WriteLine();
             foreach(var e in E)
             {
-                Console.WriteLine(e._v1+ " " + e._v2 + " " + e._distance);
+                Console.WriteLine(e._v1.number+ " " + e._v2.number + " " + e._distance);
             }
         }
         

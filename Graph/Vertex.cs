@@ -6,13 +6,23 @@ using System.Threading.Tasks;
 
 namespace Graph
 {
-    class Vertex
+    class Vertex:IComparable
     {
-        //field number
-        public int number;
+        public int number { get; set; }
         public Vertex(int number)
         {
             this.number = number;
+        }
+
+        public int CompareTo(object o)
+        {
+            Vertex v = o as Vertex;
+            if (o != null)
+            {
+                return this.number.CompareTo(v.number);
+            }
+            else
+                throw new Exception("Невозможно сравнить два объекта");
         }
     }
 }
