@@ -8,10 +8,18 @@ namespace Graph
 {
     class Vertex:IComparable
     {
-        public int number { get; set; }
+        public int Number { get; set; }
+        public string Name { get; set; }
+
+        public Vertex ()
+	    {
+            Number = 0;
+            Name = "";
+	    }
         public Vertex(int number)
         {
-            this.number = number;
+            this.Number = number;
+            Name = "";
         }
 
         public int CompareTo(object o)
@@ -19,7 +27,7 @@ namespace Graph
             Vertex v = o as Vertex;
             if (o != null)
             {
-                return this.number.CompareTo(v.number);
+                return this.Number.CompareTo(v.Number);
             }
             else
                 throw new Exception("Невозможно сравнить два объекта");
