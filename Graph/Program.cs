@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Graph
 {
@@ -11,22 +7,21 @@ namespace Graph
     {
         public static void Menu()
         {
-            Console.WriteLine(@"
-1.Добавить вершину
+            Console.WriteLine(@"1.Добавить вершину
 2.Добавить ребро
 3.Удалить вершину
 4.Удалить ребро
 5.Вывести список смежности в файл
-6.Выход");
+6.Вывести вершины и ребра
+7.Выход");
         }
         static void Main(string[] args)
         {
             Graph graph = new Graph("input.txt");
             bool flag = true;
-            
-            while(flag)
+            Menu();
+            while (flag)
             {
-                Menu();
                 Console.WriteLine("Ваш выбор: ");
                 int n = int.Parse(Console.ReadLine());
                 switch(n)
@@ -59,6 +54,9 @@ namespace Graph
                         graph.WriteMatrix("input.txt");
                         break;
                     case 6:
+                        graph.Print();
+                        break;
+                    case 7:
                         flag=false;
                         break;
 

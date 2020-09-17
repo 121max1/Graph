@@ -14,22 +14,25 @@ namespace Graph
         List<Edge> E { get; set; } = new List<Edge>();
 
         private int[,] matrix;
-        public Graph ()
-	    {
+        public Graph()
+        {
             matrix = null;
-	    }
-        public Graph (Graph prev)
-	    {
+        }
+        public Graph(Graph prev)
+        {
             V = prev.V;
             E = prev.E;
-	    }
+        }
         public Graph(string name) //конструктор внешнего класса
         {
             using (StreamReader file = new StreamReader(name))
             {
                 int n = int.Parse(file.ReadLine());
                 matrix = new int[n, n];
-                int[,] a = new int[n, n];
+                for (int i = 0; i < n; i++)
+                {
+                    V.Add(new Vertex(i));
+                }
                 for (int i = 0; i < n; i++)
                 {
                     string line = file.ReadLine();
@@ -37,97 +40,113 @@ namespace Graph
                     for (int j = 0; j < n; j++)
                     {
                         matrix[i, j] = int.Parse(mas[j]);
-                        if(matrix[i,j]!=0)
+                        if (matrix[i, j] != 0)
                         {
-                            V.Add(new Vertex(j));
                             E.Add(new Edge(new Vertex(i), new Vertex(j), matrix[i, j]));
                         }
-                    }
+                    }                 
                 }
             }
 
         }
         private void BuildMatrix()
         {
-            matrix = new int[V.Count,V.Count];
-            foreach(var edge in E)
+            for (int i = 0; i < matrix.GetLength(0); i++)
             {
-                matrix[edge._v1.Number,edge._v2.Number] = edge._distance;
+                for (int j = 0; j < matrix.GetLength(0); j++)
+                {
+                    matrix[i, j] = 0;
+                }
+            }
+            foreach (var edge in E)
+            {
+                matrix[edge.V1.Number, edge.V2.Number] = edge.Distance;
             }
         }
         public void Print()
         {
-            foreach(var v in V)
+            foreach (var v in V)
             {
-                Console.Write(v.Number+" ");
+                Console.Write(v.Number + " ");
             }
             Console.WriteLine();
-            foreach(var e in E)
+            foreach (var e in E)
             {
-                Console.WriteLine(e._v1.Number+ " " + e._v2.Number + " " + e._distance);
+                Console.WriteLine(e.V1.Number + " " + e.V2.Number + " " + e.Distance);
             }
         }
 
         public int AddVertex()
         {
-            V.Add(new Vertex(V.Count+1));
-            return V.Count+1;
+            
+            V.Add(new Vertex(V.Count));
+            matrix = new int[matrix.GetLength(0) + 1,matrix.GetLength(0) + 1];
             BuildMatrix();
+            return V.Count-1;
         }
 
-        public void AddEdge(int v1, int v2, int  dist)
+        public void AddEdge(int v1, int v2, int dist)
         {
-            if(!V.Contains(new Vertex(v1)) || !V.Contains(new Vertex(v2)))
+            if (!V.Contains(new Vertex(v1)) || !V.Contains(new Vertex(v2)))
             {
                 throw new Exception("Ошибка добавления ребра, не найдены вершины.");
             }
             else
             {
-                E.Add(new Edge(new Vertex(v1), new Vertex(v2),dist));
+                E.Add(new Edge(new Vertex(v1), new Vertex(v2), dist));
             }
             BuildMatrix();
         }
 
         public void DeleteVertex(int v)
         {
-            foreach(var edge in E)
+            var edgesToDelete = new List<Edge>();
+            foreach (var edge in E)
             {
-                if(edge._v1.Number == v || edge._v2.Number == v)
+                if (edge.V1.Number == v || edge.V2.Number == v)
                 {
-                    E.Remove(edge);
+                    edgesToDelete.Add(edge);
                 }
             }
+            foreach (var edge in edgesToDelete)
+            {
+                E.Remove(edge);
+            }
             V.Remove(new Vertex(v));
+
             BuildMatrix();
         }
 
-        public void DeleteEdge(int v1,int v2)
+        public void DeleteEdge(int v1, int v2)
         {
-             foreach(var edge in E)
-             {
-                if(edge._v1.Number == v1 && edge._v2.Number == v2)
+            Edge edgeToDelete = null;
+            foreach (var edge in E)
+            {
+                if (edge.V1.Number == v1 && edge.V2.Number == v2)
                 {
-                    E.Remove(edge);
+                    edgeToDelete = edge;
                 }
-             }
-             BuildMatrix();
+            }
+            E.Remove(edgeToDelete);
+            BuildMatrix();
         }
 
         public void WriteMatrix(string name)
         {
-            using(StreamWriter writer = new StreamWriter(name))
+            using (StreamWriter writer = new StreamWriter(name))
             {
-                writer.WriteLine(V.Count);
-                for (int i = 0; i < matrix.Length; i++)
-			    {
-                    for (int j = 0; j < matrix.Length; j++)
-			        {
-                        writer.Write(matrix[i,j] + " ");
-			        }                 
-			    }
-                writer.WriteLine();
+                writer.WriteLine(matrix.GetLength(0));
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < matrix.GetLength(0); j++)
+                    {
+                        writer.Write(matrix[i, j] + " ");
+                    }
+                    writer.WriteLine();
+                }
+                
             }
         }
-        
+
     }
 }

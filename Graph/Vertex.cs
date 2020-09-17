@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace Graph
 {
-    class Vertex:IComparable
+    class Vertex : IComparable
     {
         public int Number { get; set; }
         public string Name { get; set; }
 
-        public Vertex ()
-	    {
+        public Vertex()
+        {
             Number = 0;
             Name = "";
-	    }
+        }
         public Vertex(int number)
         {
             this.Number = number;
