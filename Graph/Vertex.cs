@@ -16,10 +16,10 @@ namespace Graph
             Number = 0;
             Name = "";
         }
-        public Vertex(int number)
+        public Vertex(int number, string Name)
         {
-            this.Number = number;
-            Name = "";
+            Number = number;
+            this.Name = Name;
         }
 
         public int CompareTo(object o)

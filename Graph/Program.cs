@@ -27,27 +27,29 @@ namespace Graph
                 switch(n)
                 {
                     case 1:
-                        Console.WriteLine("Вершина добавлена с номером {0}", graph.AddVertex());
+                        Console.WriteLine("Введите название вершины: ");
+                        string name = Console.ReadLine();
+                        Console.WriteLine("Вершина добавлена с номером {0}", graph.AddVertex(name));
                         break;
                     case 2:
                         Console.WriteLine("Введите первую вершину: ");
-                        int v1 = int.Parse(Console.ReadLine());
+                        string v1 = Console.ReadLine();
                         Console.WriteLine("Введите вторую вершину: ");
-                        int v2 = int.Parse(Console.ReadLine());
+                        string v2 = Console.ReadLine();
                         Console.WriteLine("Введите расстояние: ");
                         int d = int.Parse(Console.ReadLine());
                         graph.AddEdge(v1,v2,d);
                         break;
                     case 3:
-                        Console.WriteLine("Введите номер вершины: ");
-                        int vert = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Введите название вершины: ");
+                        string vert = Console.ReadLine();
                         graph.DeleteVertex(vert);
                         break;
                     case 4:
                         Console.WriteLine("Введите первую вершину: ");
-                        int v1_ = int.Parse(Console.ReadLine());
+                        string v1_ = Console.ReadLine();
                         Console.WriteLine("Введите вторую вершину: ");
-                        int v2_ = int.Parse(Console.ReadLine());
+                        string v2_ = Console.ReadLine();
                         graph.DeleteEdge(v1_,v2_);
                         break;
                     case 5:
