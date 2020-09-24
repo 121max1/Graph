@@ -13,7 +13,10 @@ namespace Graph
 4.Удалить ребро
 5.Вывести список смежности в файл
 6.Вывести вершины и ребра
-7.Выход");
+7.Вывести смежные вершины
+8.Вывести не смежные вершины
+9.Получить неориентрированный граф
+10.Выход");
         }
         static void Main(string[] args)
         {
@@ -59,6 +62,28 @@ namespace Graph
                         graph.Print();
                         break;
                     case 7:
+                        Console.WriteLine("Введите вершину: ");
+                        string vertex = Console.ReadLine();
+                        foreach(var v in graph.FindАdjacentVertexs(vertex))
+                        {
+                            Console.Write(v.Name + " ");
+                        }
+                        Console.WriteLine();
+                        break;
+                    case 8:
+                        Console.WriteLine("Введите вершину: ");
+                        vertex = Console.ReadLine();
+                        foreach (var v in graph.FindNonАdjacentVertexs(vertex))
+                        {
+                            Console.Write(v.Name + " ");
+                        }
+                        Console.WriteLine();
+                        break;
+                    case 9:
+                        Graph graph1 = graph.GetdisorientedGraph();
+                        graph1.Print();
+                        break;
+                    case 10:
                         flag=false;
                         break;
 
