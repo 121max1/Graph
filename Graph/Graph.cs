@@ -14,9 +14,10 @@ namespace Graph
     {
         SortedSet<Vertex> V { get; set; } = new SortedSet<Vertex>();
         List<Edge> E { get; set; } = new List<Edge>();
-
+        private SortedSet<Vertex> Visited = new SortedSet<Vertex>();
         private static int _cntVertix = 0;
         private readonly Dictionary<string,int> _namesVertex = new Dictionary<string, int>();
+        private Stack<Vertex> stack = new Stack<Vertex>();
     
         public Graph(Graph prev)
         {
@@ -26,7 +27,7 @@ namespace Graph
         }
         public Graph(string name)
         {
-            using (StreamReader file = new StreamReader(name, encoding:Encoding.Default))
+            using (StreamReader file = new StreamReader(name, encoding:Encoding.UTF8))
             {
                 int n = int.Parse(file.ReadLine());
                 string[] namesVertex = file.ReadLine().Split();
@@ -55,6 +56,21 @@ namespace Graph
             }
 
         }
+
+        public void DFS(string v)
+        {
+            Vertex visited = V.Where(x => x.Number == _namesVertex[v]).First();
+            visited.IsVisited = true;
+            Visited.Add(visited);
+            stack.Push(visited);
+            while (stack.Count != 0)
+            {
+
+            }
+                
+
+        }
+
         public void Print()
         {
             foreach (var v in V)
@@ -183,7 +199,7 @@ namespace Graph
                 _matrix[edge.V1.Number, edge.V2.Number] = edge.Distance;
             }
 
-            using (StreamWriter writer = new StreamWriter(name,false,encoding:Encoding.Default))
+            using (StreamWriter writer = new StreamWriter(name,false, encoding: Encoding.UTF8))
             {
                 writer.WriteLine(_matrix.GetLength(0));
                 foreach(var v in V)

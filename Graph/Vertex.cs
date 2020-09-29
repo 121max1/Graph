@@ -11,6 +11,8 @@ namespace Graph
         public int Number { get; set; }
         public string Name { get; set; }
 
+        public bool IsVisited { get; set; }
+
         public Vertex()
         {
             Number = 0;
