@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Runtime.ExceptionServices;
 
 namespace Graph
 {
@@ -16,7 +16,10 @@ namespace Graph
 7.Вывести смежные вершины
 8.Вывести не смежные вершины
 9.Получить неориентрированный граф
-10.Выход");
+10.Поиск в глубину
+11.Поиск компонент связанности
+12. Поиск компонент сильной связанности
+13.Выход");
         }
         static void Main(string[] args)
         {
@@ -84,6 +87,40 @@ namespace Graph
                         graph1.Print();
                         break;
                     case 10:
+                        Console.WriteLine("Введите вершину:");
+                        var ve = Console.ReadLine();
+                        foreach(var ver in graph.DFS(ve))
+                        {
+                            Console.WriteLine(ver.Name);
+                        }
+                    break;
+                    case 11:
+                        int cnt = 0;
+                        foreach (var comp in graph.FindRelatedComponents())
+                        {
+                            cnt++;
+                            Console.Write("{0} компонента связанности: ", cnt);
+                            foreach(var _vertex in comp)
+                            {
+                                Console.Write(_vertex.Name + " ");
+                            }
+                            Console.WriteLine();
+                        }
+                        break;
+                    case 12:
+                        cnt = 0;
+                        foreach (var comp in graph.FindStrongRelatedComponents())
+                        {
+                            cnt++;
+                            Console.Write("{0} компонента сильной связанности: ", cnt);
+                            foreach (var _vertex in comp)
+                            {
+                                Console.Write(_vertex + " ");
+                            }
+                            Console.WriteLine();
+                        }
+                        break;
+                    case 13:
                         flag=false;
                         break;
 

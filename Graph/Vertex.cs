@@ -23,7 +23,12 @@ namespace Graph
             Number = number;
             this.Name = Name;
         }
-
+        public Vertex(int number, string Name, bool IsVisited)
+        {
+            Number = number;
+            this.Name = Name;
+            this.IsVisited = IsVisited;
+        }
         public int CompareTo(object o)
         {
             Vertex v = o as Vertex;

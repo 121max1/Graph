@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Runtime.ExceptionServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Graph
@@ -14,20 +16,24 @@ namespace Graph
     {
         SortedSet<Vertex> V { get; set; } = new SortedSet<Vertex>();
         List<Edge> E { get; set; } = new List<Edge>();
-        private SortedSet<Vertex> Visited = new SortedSet<Vertex>();
+        List<Edge> tranposed_E = new List<Edge>();
+
         private static int _cntVertix = 0;
+
         private readonly Dictionary<string,int> _namesVertex = new Dictionary<string, int>();
-        private Stack<Vertex> stack = new Stack<Vertex>();
-    
+
+        private readonly List<string> _order = new List<string>();
+        private readonly List<string> _component = new List<string>();
+        private readonly List<string> _isVisited = new List<string>();
+        
         public Graph(Graph prev)
         {
             E = new List<Edge>(prev.E.AsEnumerable());
             V = new SortedSet<Vertex>(prev.V.AsEnumerable());
-
         }
         public Graph(string name)
         {
-            using (StreamReader file = new StreamReader(name, encoding:Encoding.UTF8))
+            using (StreamReader file = new StreamReader(name, encoding:Encoding.Default))
             {
                 int n = int.Parse(file.ReadLine());
                 string[] namesVertex = file.ReadLine().Split();
@@ -57,20 +63,90 @@ namespace Graph
 
         }
 
-        public void DFS(string v)
+        public IEnumerable<Vertex> DFS(string v)
         {
+            Stack<Vertex> stack = new Stack<Vertex>();
             Vertex visited = V.Where(x => x.Number == _namesVertex[v]).First();
-            visited.IsVisited = true;
-            Visited.Add(visited);
             stack.Push(visited);
+            SortedSet<Vertex> VisitedVertex = new SortedSet<Vertex>();
+            VisitedVertex.Add(visited);
             while (stack.Count != 0)
             {
-
+                Vertex s = stack.Pop();
+                VisitedVertex.Add(s);
+                foreach (var vert in FindАdjacentVertexs(s.Name).OrderByDescending(x => x.Number))
+                {
+                    if (!VisitedVertex.Contains(vert))
+                    {
+                        stack.Push(vert);
+                        vert.IsVisited = true;
+                    }
+                }
+                yield return s;
             }
-                
-
         }
-
+        private void DFS1(string v)
+        {
+            _isVisited.Add(v);
+            foreach(var vert in FindАdjacentVertexs(v).OrderByDescending(x => x.Number))
+            {
+                if(!_isVisited.Contains(vert.Name))
+                {
+                    DFS1(vert.Name);
+                }
+            }
+            _order.Add(v);
+        }
+        
+        private void DFS2(string v)
+        {
+            _isVisited.Add(v);
+            _component.Add(v);
+            foreach(var vert in FindTransposedАdjacentVertexs(v).OrderByDescending(x => x.Number))
+            {
+                if(!_isVisited.Contains(vert.Name))
+                {
+                    DFS2(vert.Name);
+                }
+            }
+        }
+        public IEnumerable<IEnumerable<string>> FindStrongRelatedComponents()
+        {
+            tranposed_E = Transpose(E);
+            ClearFlags();
+            foreach (var v in V)
+            {
+                if (!_isVisited.Contains(v.Name))
+                {
+                    DFS1(v.Name);
+                }
+            }
+            ClearFlags();
+            for (int i = 0; i < V.Count; ++i)
+            {
+                string v = _order[V.Count - 1 - i];
+                if (!_isVisited.Contains(v))
+                {
+                    DFS2(v);
+                    yield return _component;
+                    _component.Clear();
+                }
+            }
+        }
+        private List<Edge> Transpose(List<Edge> list)
+        {
+            List<Edge> tranposed_edges = new List<Edge>();
+            foreach(var edge in list)
+            {
+                tranposed_edges.Add(new Edge(new Vertex(edge.V2.Number, edge.V2.Name), new Vertex(edge.V1.Number, edge.V1.Name), edge.Distance));
+            }
+            return tranposed_edges;
+        }
+        
+        private void ClearFlags()
+        {
+            _isVisited.Clear();  
+        }
         public void Print()
         {
             foreach (var v in V)
@@ -113,7 +189,7 @@ namespace Graph
             }
             E.Add(new Edge(new Vertex(_namesVertex[v1], v1), new Vertex(_namesVertex[v2], v2), dist));
         }
-
+        
         public void DeleteVertex(string v)
         {
             var edgesToDelete = new List<Edge>();
@@ -148,6 +224,18 @@ namespace Graph
             foreach(var e in E)
             {
                 if(e.V1.Number==_namesVertex[v])
+                {
+                    adjacentVertexs.Add(e.V2);
+                }
+            }
+            return adjacentVertexs;
+        }
+        private IEnumerable<Vertex> FindTransposedАdjacentVertexs(string v)
+        {
+            SortedSet<Vertex> adjacentVertexs = new SortedSet<Vertex>();
+            foreach (var e in tranposed_E)
+            {
+                if (e.V1.Number == _namesVertex[v])
                 {
                     adjacentVertexs.Add(e.V2);
                 }
@@ -199,7 +287,7 @@ namespace Graph
                 _matrix[edge.V1.Number, edge.V2.Number] = edge.Distance;
             }
 
-            using (StreamWriter writer = new StreamWriter(name,false, encoding: Encoding.UTF8))
+            using (StreamWriter writer = new StreamWriter(name,false, encoding: Encoding.Default))
             {
                 writer.WriteLine(_matrix.GetLength(0));
                 foreach(var v in V)
@@ -218,6 +306,48 @@ namespace Graph
                 
             }
         }
-
+        public IEnumerable<IEnumerable<Vertex>> FindRelatedComponents()
+        {
+            List<Vertex> relations = new List<Vertex>();
+            V.ToList().ForEach(item => relations.Add(new Vertex(item.Number, item.Name)));
+            while(relations.Count!=0)
+            {
+                List<Vertex> comp = new List<Vertex>();
+                foreach(var v in DFS(relations.First().Name))
+                {
+                    comp.Add(v);
+                }
+                #region Mda
+                List<Vertex> _toRemove = new List<Vertex>();
+                foreach(var vert in relations)
+                {
+                    foreach (var v in comp)
+                    {
+                       if (v.Number == vert.Number)
+                        {
+                            _toRemove.Add(v);
+                        }
+                    }
+                }
+                foreach(var ver in _toRemove)
+                {
+                    relations.RemoveAll(x => x.Number == ver.Number);
+                }
+                #endregion
+                yield return comp;
+            }    
+        }
+        public bool IsDisorientedGraph()
+        {
+            foreach(var e in E)
+            {
+                if (!E.Contains(new Edge(new Vertex(e.V2.Number, e.V2.Name), new Vertex(e.V1.Number, e.V1.Name), e.Distance)))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
+   
 }
