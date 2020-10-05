@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Graph
 {
-    class Edge
+    class Edge:IComparable
     {
         public Vertex V1 { get; set; }
         public Vertex V2 { get; set; }
@@ -19,6 +19,17 @@ namespace Graph
             V1 = v1;
             V2 = v2;
             Distance = distance;
+        }
+
+        public int CompareTo(object obj)
+        {
+            Edge v = obj as Edge;
+            if (obj != null)
+            {
+                return this.Distance.CompareTo(v.Distance);
+            }
+            else
+                throw new Exception("Невозможно сравнить два объекта");
         }
     }
 }

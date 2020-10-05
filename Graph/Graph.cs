@@ -31,6 +31,10 @@ namespace Graph
             E = new List<Edge>(prev.E.AsEnumerable());
             V = new SortedSet<Vertex>(prev.V.AsEnumerable());
         }
+        public Graph()
+        {
+
+        }
         public Graph(string name)
         {
             using (StreamReader file = new StreamReader(name, encoding:Encoding.Default))
@@ -305,6 +309,50 @@ namespace Graph
                 }
                 
             }
+        }
+        public  Graph AlgBoruvka()
+        {
+            Graph T = new Graph();
+            foreach(var v in V)
+            {
+                List<Edge> edges = new List<Edge>();
+                foreach(var e in E)
+                {
+                    if(e.V1.Name == v.Name)
+                    {
+                        edges.Add(e);
+                    }
+                }
+                var min_edge = edges.Min();
+                if(!T.E.Contains(min_edge))//??
+                {
+                    T.E.Add(min_edge);
+                }
+            }
+            while(T.FindRelatedComponents().Count()!=1)
+            {
+                foreach(var comp in T.FindRelatedComponents())
+                {
+                    foreach (var v in V)
+                    {
+                        List<Edge> edges = new List<Edge>();
+                        foreach (var e in E)
+                        {
+                            if (e.V1.Name == v.Name)
+                            {
+                                edges.Add(e);
+                            }
+                        }
+                        var min_edge = edges.Min();
+                        if (!T.E.Contains(min_edge))//??
+                        {
+                            T.E.Add(min_edge);
+                        }
+                    }
+
+                }
+            }
+            return T;
         }
         public IEnumerable<IEnumerable<Vertex>> FindRelatedComponents()
         {
