@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
+using System.Security.AccessControl;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
@@ -20,7 +22,7 @@ namespace Graph
 
         private static int _cntVertix = 0;
 
-        private readonly Dictionary<string,int> _namesVertex = new Dictionary<string, int>();
+        private  Dictionary<string,int> _namesVertex = new Dictionary<string, int>();
 
         private readonly List<string> _order = new List<string>();
         private readonly List<string> _component = new List<string>();
@@ -30,6 +32,7 @@ namespace Graph
         {
             E = new List<Edge>(prev.E.AsEnumerable());
             V = new SortedSet<Vertex>(prev.V.AsEnumerable());
+            _namesVertex = new Dictionary<string, int>(prev._namesVertex);
         }
         public Graph()
         {
@@ -38,29 +41,16 @@ namespace Graph
         public Graph(string name)
         {
             using (StreamReader file = new StreamReader(name, encoding:Encoding.Default))
-            {
-                int n = int.Parse(file.ReadLine());
+            { 
                 string[] namesVertex = file.ReadLine().Split();
-                for (int i = 0; i < n; i++)
+                for (int i = 0; i < namesVertex.Length; i++)
                 {
-                    _namesVertex.Add(namesVertex[i],i);
+                    AddVertex(namesVertex[i]);
                 }
-                    for (int i = 0; i < n; i++)
+                while(!file.EndOfStream)
                 {
-                    V.Add(new Vertex(i,namesVertex[i]));
-                    _cntVertix++;
-                }
-                for (int i = 0; i < n; i++)
-                {
-                    string line = file.ReadLine();
-                    string[] mas = line.Split(' ');
-                    for (int j = 0; j < n; j++)
-                    {
-                        if (int.Parse(mas[j]) != 0)
-                        {
-                            E.Add(new Edge(new Vertex(i, namesVertex[i]), new Vertex(j,namesVertex[j]), int.Parse(mas[j])));
-                        }
-                    }                 
+                    string[] edgeArr = file.ReadLine().Split();
+                    AddEdge(edgeArr[0], edgeArr[1], int.Parse(edgeArr[2]));
                 }
                 
             }
@@ -70,13 +60,19 @@ namespace Graph
         public IEnumerable<Vertex> DFS(string v)
         {
             Stack<Vertex> stack = new Stack<Vertex>();
+            List<Vertex> toReturn = new List<Vertex>();
             Vertex visited = V.Where(x => x.Number == _namesVertex[v]).First();
             stack.Push(visited);
+            toReturn.Add(visited);
             SortedSet<Vertex> VisitedVertex = new SortedSet<Vertex>();
             VisitedVertex.Add(visited);
             while (stack.Count != 0)
             {
                 Vertex s = stack.Pop();
+                if(!VisitedVertex.Contains(s))
+                {
+                    toReturn.Add(s);
+                }
                 VisitedVertex.Add(s);
                 foreach (var vert in FindАdjacentVertexs(s.Name).OrderByDescending(x => x.Number))
                 {
@@ -86,8 +82,8 @@ namespace Graph
                         vert.IsVisited = true;
                     }
                 }
-                yield return s;
             }
+            return toReturn;
         }
         private void DFS1(string v)
         {
@@ -310,49 +306,97 @@ namespace Graph
                 
             }
         }
-        public  Graph AlgBoruvka()
+
+        private IEnumerable<Edge> FindAdjacentEdges(Vertex vertex)
         {
-            Graph T = new Graph();
-            foreach(var v in V)
+            foreach(var e in E)
             {
-                List<Edge> edges = new List<Edge>();
-                foreach(var e in E)
+                if (e.V1.Number == vertex.Number)
                 {
-                    if(e.V1.Name == v.Name)
-                    {
-                        edges.Add(e);
-                    }
-                }
-                var min_edge = edges.Min();
-                if(!T.E.Contains(min_edge))//??
-                {
-                    T.E.Add(min_edge);
+                    yield return e;
                 }
             }
+        }
+        private Edge FindMinEdgeInRelatedComponent(IEnumerable<Vertex> component, IEnumerable<Edge> edgesInComponent)
+        {
+            int min = E.Select(x=>x.Distance).Max();
+            SortedSet <Edge> minEdgesInVertexs = new SortedSet<Edge>();
+            List<Edge> minEdges = new List<Edge>();
+            foreach(var vertex in component)
+            {
+                foreach (var edge in FindAdjacentEdges(vertex))
+                {
+                    if (edge.Distance < min && !edgesInComponent.Contains(edge))
+                    {
+                        minEdges.Add(edge);
+                    }
+                }
+
+            }
+            return minEdges.OrderBy(edge => edge.Distance).First();
+        }
+        public IEnumerable<Edge> FindEdgesInRalatedComponents(IEnumerable<Vertex> component)
+        {
+            List<Edge> toReturn = new List<Edge>();
+            foreach (var edge in E)
+            {
+                foreach (var vert1 in component)
+                {
+                    foreach (var vert2 in component)
+                    {
+
+                        if (edge.V1.Number == vert1.Number && edge.V2.Number == vert2.Number)
+                        {
+                            toReturn.Add(edge);
+                        }
+
+                    }
+                }
+            }
+            return toReturn;
+        }
+        public Graph AlgBoruvka()
+        {
+            Graph T = new Graph();
+            T.V = V;
+            T._namesVertex = _namesVertex;
+
             while(T.FindRelatedComponents().Count()!=1)
             {
-                foreach(var comp in T.FindRelatedComponents())
+                foreach(var relatedComponent in T.FindRelatedComponents())
                 {
-                    foreach (var v in V)
-                    {
-                        List<Edge> edges = new List<Edge>();
-                        foreach (var e in E)
-                        {
-                            if (e.V1.Name == v.Name)
-                            {
-                                edges.Add(e);
-                            }
-                        }
-                        var min_edge = edges.Min();
-                        if (!T.E.Contains(min_edge))//??
-                        {
-                            T.E.Add(min_edge);
-                        }
-                    }
-
+                    T.E.Add(FindMinEdgeInRelatedComponent(relatedComponent, FindEdgesInRalatedComponents(relatedComponent)));
                 }
             }
             return T;
+        }
+
+        private void dfs(string v)
+        {
+            _isVisited.Add(v);
+            _component.Add(v);
+            foreach (var vert in FindАdjacentVertexs(v).OrderByDescending(x => x.Number))
+            {
+                if (!_isVisited.Contains(vert.Name))
+                {
+                    dfs(vert.Name);
+                }
+            }
+        }
+        public IEnumerable<IEnumerable<string>> FindRelatedComponentsRecur()
+        {
+            ClearFlags();
+            List<List<string>> toReturn = new List<List<string>>();
+            foreach (var vert in V)
+            {
+                if (!_isVisited.Contains(vert.Name))
+                {
+                    _component.Clear();
+                    dfs(vert.Name);
+                    toReturn.Add(_component);
+                }
+            }
+            return toReturn;
         }
         public IEnumerable<IEnumerable<Vertex>> FindRelatedComponents()
         {

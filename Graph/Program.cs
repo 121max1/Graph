@@ -19,7 +19,8 @@ namespace Graph
 10.Поиск в глубину
 11.Поиск компонент связанности
 12. Поиск компонент сильной связанности
-13.Выход");
+13. Алгоритм Буровки
+14.Выход");
         }
         static void Main(string[] args)
         {
@@ -121,6 +122,10 @@ namespace Graph
                         }
                         break;
                     case 13:
+                        Graph minGraph = graph.GetdisorientedGraph().AlgBoruvka();
+                        minGraph.Print();
+                        break;
+                    case 14:
                         flag=false;
                         break;
 
