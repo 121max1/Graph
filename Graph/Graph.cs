@@ -319,21 +319,21 @@ namespace Graph
         }
         private Edge FindMinEdgeInRelatedComponent(IEnumerable<Vertex> component, IEnumerable<Edge> edgesInComponent)
         {
-            int min = E.Select(x=>x.Distance).Max();
+            int min = E.Select(x => x.Distance).Max();
             SortedSet <Edge> minEdgesInVertexs = new SortedSet<Edge>();
             List<Edge> minEdges = new List<Edge>();
             foreach(var vertex in component)
             {
                 foreach (var edge in FindAdjacentEdges(vertex))
                 {
-                    if (edge.Distance < min && !edgesInComponent.Contains(edge))
+                    if (edge.Distance <= min && !edgesInComponent.Contains(edge))
                     {
                         minEdges.Add(edge);
                     }
                 }
 
             }
-            return minEdges.OrderBy(edge => edge.Distance).First();
+            return minEdges.OrderBy(edge => edge.Distance).FirstOrDefault();
         }
         public IEnumerable<Edge> FindEdgesInRalatedComponents(IEnumerable<Vertex> component)
         {
@@ -365,38 +365,14 @@ namespace Graph
             {
                 foreach(var relatedComponent in T.FindRelatedComponents())
                 {
-                    T.E.Add(FindMinEdgeInRelatedComponent(relatedComponent, FindEdgesInRalatedComponents(relatedComponent)));
+                    Edge minEdgeInRelatedComponent = FindMinEdgeInRelatedComponent(relatedComponent, FindEdgesInRalatedComponents(relatedComponent));
+                    if (minEdgeInRelatedComponent != null)
+                    {
+                        T.E.Add(minEdgeInRelatedComponent);
+                    }
                 }
             }
-            return T;
-        }
-
-        private void dfs(string v)
-        {
-            _isVisited.Add(v);
-            _component.Add(v);
-            foreach (var vert in FindАdjacentVertexs(v).OrderByDescending(x => x.Number))
-            {
-                if (!_isVisited.Contains(vert.Name))
-                {
-                    dfs(vert.Name);
-                }
-            }
-        }
-        public IEnumerable<IEnumerable<string>> FindRelatedComponentsRecur()
-        {
-            ClearFlags();
-            List<List<string>> toReturn = new List<List<string>>();
-            foreach (var vert in V)
-            {
-                if (!_isVisited.Contains(vert.Name))
-                {
-                    _component.Clear();
-                    dfs(vert.Name);
-                    toReturn.Add(_component);
-                }
-            }
-            return toReturn;
+            return T.GetdisorientedGraph();
         }
         public IEnumerable<IEnumerable<Vertex>> FindRelatedComponents()
         {

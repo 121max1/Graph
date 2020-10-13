@@ -97,15 +97,31 @@ namespace Graph
                     break;
                     case 11:
                         int cnt = 0;
-                        foreach (var comp in graph.FindRelatedComponents())
+                        if (graph.IsDisorientedGraph())
                         {
-                            cnt++;
-                            Console.Write("{0} компонента связанности: ", cnt);
-                            foreach(var _vertex in comp)
+                            foreach (var comp in graph.FindRelatedComponents())
                             {
-                                Console.Write(_vertex.Name + " ");
+                                cnt++;
+                                Console.Write("{0} компонента связанности: ", cnt);
+                                foreach (var _vertex in comp)
+                                {
+                                    Console.Write(_vertex.Name + " ");
+                                }
+                                Console.WriteLine();
                             }
-                            Console.WriteLine();
+                        }
+                        else
+                        {
+                            foreach (var comp in graph.FindStrongRelatedComponents())
+                            {
+                                cnt++;
+                                Console.Write("{0} компонента сильной связанности: ", cnt);
+                                foreach (var _vertex in comp)
+                                {
+                                    Console.Write(_vertex + " ");
+                                }
+                                Console.WriteLine();
+                            }
                         }
                         break;
                     case 12:
@@ -122,7 +138,9 @@ namespace Graph
                         }
                         break;
                     case 13:
-                        Graph minGraph = graph.GetdisorientedGraph().AlgBoruvka();
+                        Graph copy = new Graph(graph);
+                        graph = graph.GetdisorientedGraph();
+                        Graph minGraph = graph.AlgBoruvka();
                         minGraph.Print();
                         break;
                     case 14:
