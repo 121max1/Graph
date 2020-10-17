@@ -20,7 +20,9 @@ namespace Graph
 11.Поиск компонент связанности
 12. Поиск компонент сильной связанности
 13. Алгоритм Буровки
-14.Выход");
+14. Вершина с кратчайшей суммой расстояний.
+15. Найти центр графа.
+16.Выход");
         }
         static void Main(string[] args)
         {
@@ -31,7 +33,7 @@ namespace Graph
             {
                 Console.WriteLine("Ваш выбор: ");
                 int n = int.Parse(Console.ReadLine());
-                switch(n)
+                switch (n)
                 {
                     case 1:
                         Console.WriteLine("Введите название вершины: ");
@@ -45,7 +47,7 @@ namespace Graph
                         string v2 = Console.ReadLine();
                         Console.WriteLine("Введите расстояние: ");
                         int d = int.Parse(Console.ReadLine());
-                        graph.AddEdge(v1,v2,d);
+                        graph.AddEdge(v1, v2, d);
                         break;
                     case 3:
                         Console.WriteLine("Введите название вершины: ");
@@ -57,7 +59,7 @@ namespace Graph
                         string v1_ = Console.ReadLine();
                         Console.WriteLine("Введите вторую вершину: ");
                         string v2_ = Console.ReadLine();
-                        graph.DeleteEdge(v1_,v2_);
+                        graph.DeleteEdge(v1_, v2_);
                         break;
                     case 5:
                         graph.WriteMatrix("input.txt");
@@ -68,7 +70,7 @@ namespace Graph
                     case 7:
                         Console.WriteLine("Введите вершину: ");
                         string vertex = Console.ReadLine();
-                        foreach(var v in graph.FindАdjacentVertexs(vertex))
+                        foreach (var v in graph.FindАdjacentVertexs(vertex))
                         {
                             Console.Write(v.Name + " ");
                         }
@@ -90,11 +92,11 @@ namespace Graph
                     case 10:
                         Console.WriteLine("Введите вершину:");
                         var ve = Console.ReadLine();
-                        foreach(var ver in graph.DFS(ve))
+                        foreach (var ver in graph.DFS(ve))
                         {
                             Console.WriteLine(ver.Name);
                         }
-                    break;
+                        break;
                     case 11:
                         int cnt = 0;
                         if (graph.IsDisorientedGraph())
@@ -141,10 +143,22 @@ namespace Graph
                         Graph copy = new Graph(graph);
                         graph = graph.GetdisorientedGraph();
                         Graph minGraph = graph.AlgBoruvka();
+                        graph = copy;
                         minGraph.Print();
                         break;
                     case 14:
-                        flag=false;
+                        Console.WriteLine(graph.FindVertexWithMinDistancees().Name);
+                        break;
+                    case 15:
+                        Console.Write("Центр графа: ");
+                        foreach (var verte in graph.FindCenter())
+                        {
+                            Console.Write(verte.Name + " ");
+                        }
+                        Console.WriteLine();
+                        break;
+                    case 16:
+                        flag = false;
                         break;
 
                 }

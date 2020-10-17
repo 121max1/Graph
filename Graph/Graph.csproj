@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlgDjekstra\AlgDjekstr.cs" />
+    <Compile Include="AlgDjekstra\EdgeDjekstra.cs" />
+    <Compile Include="AlgDjekstra\VertexDjekstra.cs" />
     <Compile Include="Edge.cs" />
     <Compile Include="Graph.cs" />
     <Compile Include="Program.cs" />

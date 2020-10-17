@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Graph.AlgDjekstra;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
@@ -16,8 +17,8 @@ namespace Graph
 {
     class Graph
     {
-        SortedSet<Vertex> V { get; set; } = new SortedSet<Vertex>();
-        List<Edge> E { get; set; } = new List<Edge>();
+        public SortedSet<Vertex> V { get; set; } = new SortedSet<Vertex>();
+        public List<Edge> E { get; set; } = new List<Edge>();
         List<Edge> tranposed_E = new List<Edge>();
 
         private static int _cntVertix = 0;
@@ -230,6 +231,74 @@ namespace Graph
             }
             return adjacentVertexs;
         }
+
+        public Vertex FindVertexWithMinDistancees()
+        {
+            Dictionary<Vertex, int> minDistancesVertex = new Dictionary<Vertex, int>();
+            foreach(var vert in V)
+            {
+                minDistancesVertex.Add(vert, AlgDjekstr.AlgDjekstra(vert, this).Where(item => item.Value != int.MaxValue).Sum(item => item.Value));
+            }
+            return minDistancesVertex.OrderBy(item => item.Value).First().Key;
+        }
+
+        public IEnumerable<KeyValuePair<Vertex, int>> AlgFordBellman(Vertex vertex)
+        {
+            Dictionary<Vertex, int> disntances = new Dictionary<Vertex, int>();
+            foreach (var v in V)
+            {
+                disntances.Add(v, int.MaxValue/2);
+            }
+            disntances[disntances.Where(v => v.Key == vertex).First().Key] = 0;
+
+            for(int i = 0; i<V.Count()-1; ++i)
+            {
+                foreach(var edge in E)
+                {
+                    var v1 = V.Where(v => v == edge.V1).FirstOrDefault(); 
+                    var v2 = V.Where(v => v == edge.V2).FirstOrDefault();
+                    disntances[v2] = Math.Min(disntances[v2], disntances[v1] + edge.Distance);
+                }
+            }
+
+            return disntances;
+        }
+        private int FindEccentricity(Vertex vertex)
+        {
+            List<int> minDist = new List<int>();
+            foreach(var v in V)
+            {
+                if (v != vertex)
+                {
+                    minDist.Add(AlgFordBellman(v).Where(x => x.Key == vertex && x.Value != int.MaxValue / 2).FirstOrDefault().Value);
+                }
+            }
+            return minDist.Max();
+        }
+        private int FindRadius()
+        {
+            List<int> Eccentricity = new List<int>();
+            foreach(var v in V)
+            {
+                int findEccentricity = FindEccentricity(v);
+                if (findEccentricity != 0)
+                {
+                    Eccentricity.Add(findEccentricity);
+                }
+            }
+            return Eccentricity.Min();
+        }
+        public IEnumerable<Vertex> FindCenter()
+        {
+            int radius = FindRadius();
+            foreach (var v in V)
+            {
+                if(FindEccentricity(v) == radius)
+                {
+                    yield return v;
+                }
+            }
+        }
         private IEnumerable<Vertex> FindTransposedАdjacentVertexs(string v)
         {
             SortedSet<Vertex> adjacentVertexs = new SortedSet<Vertex>();
@@ -417,5 +486,4 @@ namespace Graph
             return true;
         }
     }
-   
 }
