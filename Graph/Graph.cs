@@ -257,7 +257,10 @@ namespace Graph
                 {
                     var v1 = V.Where(v => v == edge.V1).FirstOrDefault(); 
                     var v2 = V.Where(v => v == edge.V2).FirstOrDefault();
-                    disntances[v2] = Math.Min(disntances[v2], disntances[v1] + edge.Distance);
+                    if (disntances[v1] < int.MaxValue / 2)
+                    {
+                        disntances[v2] = Math.Min(disntances[v2], disntances[v1] + edge.Distance);
+                    }
                 }
             }
 
@@ -299,7 +302,7 @@ namespace Graph
             {
                 if (v != vertex)
                 {
-                    minDist.Add(AlgFordBellman(v).Where(x => x.Key == vertex && x.Value != int.MaxValue / 2).FirstOrDefault().Value);
+                   minDist.Add(AlgFordBellman(v).Where(x => x.Key == vertex && x.Value != int.MaxValue / 2).FirstOrDefault().Value);
                 }
             }
             return minDist.Max();
@@ -374,7 +377,7 @@ namespace Graph
             {
                 foreach(var dist in AlgFordBellmanNegative(v))
                 {
-                    if (dist.Value != 0 && dist.Value != int.MaxValue / 2)
+                    if (dist.Value != 0 && dist.Value < int.MaxValue / 2 - 1000)
                     {
                         yield return new Edge(v, dist.Key, dist.Value);
                     }
