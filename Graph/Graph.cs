@@ -263,6 +263,35 @@ namespace Graph
 
             return disntances;
         }
+        public IEnumerable<KeyValuePair<Vertex, int>> AlgFordBellmanNegative(Vertex vertex)
+        {
+            Dictionary<Vertex, int> disntances = new Dictionary<Vertex, int>();
+            foreach (var v in V)
+            {
+                disntances.Add(v, int.MaxValue / 2);
+            }
+
+            disntances[disntances.Where(v => v.Key == vertex).First().Key] = 0;
+
+            for (int i = 0; i < V.Count() - 1; ++i)
+            {
+                foreach (var edge in E)
+                {
+                    var v1 = V.Where(v => v == edge.V1).FirstOrDefault();
+                    var v2 = V.Where(v => v == edge.V2).FirstOrDefault();
+                    if(disntances[v1]<int.MaxValue/2)
+                    {
+                        if (disntances[v2]>disntances[v1]+edge.Distance)
+                        {
+                            disntances[v2] = Math.Max(-int.MaxValue, disntances[v1] + edge.Distance);
+                        }
+                    }
+                    disntances[v2] = Math.Min(disntances[v2], disntances[v1] + edge.Distance);
+                }
+            }
+
+            return disntances;
+        }
         private int FindEccentricity(Vertex vertex)
         {
             List<int> minDist = new List<int>();
@@ -339,7 +368,19 @@ namespace Graph
             }
             E.Remove(edgeToDelete);
         }
-
+        public IEnumerable<Edge> GetMinDistancesForEachPair()
+        {
+            foreach(var v in V)
+            {
+                foreach(var dist in AlgFordBellmanNegative(v))
+                {
+                    if (dist.Value != 0 && dist.Value != int.MaxValue / 2)
+                    {
+                        yield return new Edge(v, dist.Key, dist.Value);
+                    }
+                }
+            }
+        }
         public void WriteMatrix(string name)
         {
             int[,] _matrix = new int[V.Count, V.Count];
