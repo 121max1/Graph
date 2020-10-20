@@ -25,7 +25,7 @@ namespace Graph.AlgDjekstra
             Name = v.Name;
             IsVisited = v.IsVisited;
             Number = v.Number;
-            CurrentMark = int.MaxValue;
+            CurrentMark = int.MaxValue/2;
         }
     }
 }

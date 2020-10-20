@@ -235,9 +235,9 @@ namespace Graph
         public Vertex FindVertexWithMinDistancees()
         {
             Dictionary<Vertex, int> minDistancesVertex = new Dictionary<Vertex, int>();
-            foreach(var vert in V)
+            foreach(var vert in V)  
             {
-                minDistancesVertex.Add(vert, AlgDjekstr.AlgDjekstra(vert, this).Where(item => item.Value != int.MaxValue).Sum(item => item.Value));
+                minDistancesVertex.Add(vert, AlgDjekstr.AlgDjekstra(vert, this).Where(item => item.Value < int.MaxValue/2).Sum(item => item.Value));
             }
             return minDistancesVertex.OrderBy(item => item.Value).First().Key;
         }
@@ -275,9 +275,10 @@ namespace Graph
             }
 
             disntances[disntances.Where(v => v.Key == vertex).First().Key] = 0;
-
-            for (int i = 0; i < V.Count() - 1; ++i)
+            int x = 0;
+            for (int i = 0; i < V.Count(); ++i)
             {
+                x = -1;
                 foreach (var edge in E)
                 {
                     var v1 = V.Where(v => v == edge.V1).FirstOrDefault();
@@ -286,14 +287,17 @@ namespace Graph
                     {
                         if (disntances[v2]>disntances[v1]+edge.Distance)
                         {
-                            disntances[v2] = Math.Max(-int.MaxValue, disntances[v1] + edge.Distance);
+                            disntances[v2] = Math.Max(-int.MaxValue/2, disntances[v1] + edge.Distance);
+                            x = v2.Number;
                         }
                     }
-                    disntances[v2] = Math.Min(disntances[v2], disntances[v1] + edge.Distance);
                 }
             }
-
-            return disntances;
+            if (x == -1)
+            {
+                return disntances;
+            }
+            return null;
         }
         private int FindEccentricity(Vertex vertex)
         {
@@ -375,11 +379,15 @@ namespace Graph
         {
             foreach(var v in V)
             {
-                foreach(var dist in AlgFordBellmanNegative(v))
+                var listBellman = AlgFordBellmanNegative(v);
+                if (listBellman != null)
                 {
-                    if (dist.Value != 0 && dist.Value < int.MaxValue / 2 - 1000)
+                    foreach (var dist in AlgFordBellmanNegative(v))
                     {
-                        yield return new Edge(v, dist.Key, dist.Value);
+                        if (dist.Value != 0 && dist.Value < int.MaxValue / 2 - 1000)
+                        {
+                            yield return new Edge(v, dist.Key, dist.Value);
+                        }
                     }
                 }
             }
