@@ -299,6 +299,7 @@ namespace Graph
             }
             return null;
         }
+
         private int FindEccentricity(Vertex vertex)
         {
             List<int> minDist = new List<int>();
@@ -311,6 +312,7 @@ namespace Graph
             }
             return minDist.Max();
         }
+
         private int FindRadius()
         {
             List<int> Eccentricity = new List<int>();
@@ -347,6 +349,61 @@ namespace Graph
             }
             return adjacentVertexs;
         }
+        
+        public int maxFlow(string s, string t)
+        {
+            List<Vertex> vert = new List<Vertex>();
+            foreach(var v in V)
+            {
+                vert.Add(new Vertex(v.Number, v.Name));
+            }
+            List<Edge> capability = new List<Edge>();
+            foreach(var edge in E)
+            {
+                var vert1 = vert.Where(item => item == edge.V1).First(); 
+                var vert2 = vert.Where(item => item == edge.V2).First();
+                capability.Add(new Edge(vert1, vert2, edge.Distance));
+                capability.Add(new Edge(vert2, vert1, edge.Distance));
+            }
+
+            for(int flow = 0; ;)
+            {
+                int df = FindPath(vert, 
+                    capability, new List<Vertex>(), 
+                    vert.Where(item=>item.Name== s).First(), 
+                    vert.Where(item => item.Name == t).First(), 
+                    int.MaxValue);
+                if (df == 0)
+                    return flow;
+                flow += df;
+            }
+        }
+        int FindPath(List<Vertex> vertices,List<Edge> cap, List<Vertex> visited, Vertex u, Vertex t, int f)
+        {
+            if (u == t)
+            {
+                return f;
+            }
+            visited.Add(vertices.Where(x=>x==u).FirstOrDefault());
+            foreach(var v in vertices)
+            {
+                Edge edge = cap.Where(item => item.V1 == u && item.V2 == v).FirstOrDefault();
+                Edge edge_rev = cap.Where(item => item.V1 == v && item.V2 == u).FirstOrDefault();
+                if (!visited.Contains(v) && edge!=null)
+                {
+                    int df = FindPath(vertices, cap, visited,v, t, Math.Min(f, edge.Distance));
+                    if(df > 0)
+                    {
+                        edge.Distance -= df;
+                        edge_rev.Distance += df;
+                        return df;
+                    }
+                }
+            }
+            return 0;
+        }
+
+        
         public Graph GetdisorientedGraph()
         {
             Graph disorientedGraph = new Graph(this);

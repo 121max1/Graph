@@ -23,11 +23,12 @@ namespace Graph
 14.Вершина с кратчайшей суммой расстояний.
 15.Найти центр графа.
 16.Минимальные расстояния между любыми парами вершин.
-17.Выход");
+17.Поиск максимального потока в сети
+18.Выход");
         }
         static void Main(string[] args)
         {
-            Graph graph = new Graph("input1.txt");
+            Graph graph = new Graph("input2.txt");
             bool flag = true;
             Menu();
             while (flag)
@@ -166,6 +167,14 @@ namespace Graph
                         }
                         break;
                     case 17:
+                        Console.WriteLine("Введите первую вершину: ");
+                        v1 = Console.ReadLine();
+                        Console.WriteLine("Введите вторую вершину: ");
+                        v2 = Console.ReadLine();
+                        Console.Write("Максимальный поток: {0} ",graph.maxFlow(v1,v2));
+                        Console.WriteLine();
+                        break;
+                    case 18:
                         flag = false;
                         break;
 
