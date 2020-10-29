@@ -28,7 +28,7 @@ namespace Graph
         }
         static void Main(string[] args)
         {
-            Graph graph = new Graph("input2.txt");
+            Graph graph = new Graph("input3.txt");
             bool flag = true;
             Menu();
             while (flag)
