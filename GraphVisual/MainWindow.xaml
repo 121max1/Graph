@@ -1,0 +1,30 @@
+﻿<Window x:Class="GraphVisual.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GraphVisual"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="600" Width="1000
+        ">
+    <Grid>
+        <Canvas HorizontalAlignment="Left" Height="392" Margin="86,22,0,0" VerticalAlignment="Top" Width="647"/>
+        <Button HorizontalAlignment="Left" Margin="7,22,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
+            <Image Source = "Resources/AddVertexImage.png" Width="69" Height="52"/>
+        </Button>
+        <Button HorizontalAlignment="Left" Margin="7,82,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
+            <Image Source = "Resources/AddEdgeImage.png" Width="69" Height="52"/>
+        </Button>
+        <Button HorizontalAlignment="Left" Margin="7,142,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
+            <Image Source = "Resources/DeleteButtonImage.jpg" Width="69" Height="52"/>
+        </Button>
+        <Button HorizontalAlignment="Left" Margin="7,203,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
+            <Image Source = "Resources/SelectVertexImage.jpg" Width="69" Height="52"/>
+        </Button>
+    </Grid>
+    
+</Window>
+
+
+    
+    
