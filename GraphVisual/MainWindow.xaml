@@ -21,8 +21,26 @@
         <Button HorizontalAlignment="Left" Margin="7,203,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
             <Image Source = "Resources/SelectVertexImage.jpg" Width="69" Height="52"/>
         </Button>
-    </Grid>
-    
+        <Label Content="Выберите алгоритм:" HorizontalAlignment="Left" Margin="740,21,0,0" VerticalAlignment="Top" Width="142" RenderTransformOrigin="0.059,-1.331" FontSize="14"/>
+        <ComboBox HorizontalAlignment="Left" Margin="746,51,0,0" VerticalAlignment="Top" Width="133" IsSynchronizedWithCurrentItem="False">
+            <ComboBoxItem IsSelected="True">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock>Обход в глубину</TextBlock>
+                </StackPanel>
+            </ComboBoxItem>
+            <ComboBoxItem IsSelected="True">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock>Обход в ширину</TextBlock>
+                </StackPanel>
+            </ComboBoxItem>
+            <ComboBoxItem IsSelected="True">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock>Алгоритм Дейстры</TextBlock>
+                </StackPanel>
+            </ComboBoxItem>
+        </ComboBox>
+    </Grid> 
+
 </Window>
 
 
