@@ -8,21 +8,21 @@
         Title="MainWindow" Height="600" Width="1000
         ">
     <Grid>
-        <Canvas HorizontalAlignment="Left" Height="392" Margin="86,22,0,0" VerticalAlignment="Top" Width="647"/>
-        <Button HorizontalAlignment="Left" Margin="7,22,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
+        <Canvas  Name ="GraphCanvas" HorizontalAlignment="Left" Height="392" Margin="86,22,0,0" VerticalAlignment="Top" Width="647" MouseLeftButtonDown="Canvas_MouseLeftButtonDown"/>
+        <Button Name="AddVertexButton" HorizontalAlignment="Left" Margin="7,22,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52" Click="AddVertexButton_Click">
             <Image Source = "Resources/AddVertexImage.png" Width="69" Height="52"/>
         </Button>
-        <Button HorizontalAlignment="Left" Margin="7,82,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
+        <Button Name ="AddEdgeButton"  HorizontalAlignment="Left" Margin="7,82,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
             <Image Source = "Resources/AddEdgeImage.png" Width="69" Height="52"/>
         </Button>
-        <Button HorizontalAlignment="Left" Margin="7,142,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
+        <Button Name="DeleteButton" HorizontalAlignment="Left" Margin="7,142,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
             <Image Source = "Resources/DeleteButtonImage.jpg" Width="69" Height="52"/>
         </Button>
-        <Button HorizontalAlignment="Left" Margin="7,203,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
+        <Button Name="SelectVertexButton" HorizontalAlignment="Left" Margin="7,203,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
             <Image Source = "Resources/SelectVertexImage.jpg" Width="69" Height="52"/>
         </Button>
-        <Label Content="Выберите алгоритм:" HorizontalAlignment="Left" Margin="740,21,0,0" VerticalAlignment="Top" Width="142" RenderTransformOrigin="0.059,-1.331" FontSize="14"/>
-        <ComboBox HorizontalAlignment="Left" Margin="746,51,0,0" VerticalAlignment="Top" Width="133" IsSynchronizedWithCurrentItem="False">
+        <Label Content="Выберите алгоритм:" HorizontalAlignment="Left" Margin="746,88,0,0" VerticalAlignment="Top" Width="142" RenderTransformOrigin="0.059,-1.331" FontSize="14"/>
+        <ComboBox HorizontalAlignment="Left" Margin="746,122,0,0" VerticalAlignment="Top" Width="165" IsSynchronizedWithCurrentItem="False" FontSize="14">
             <ComboBoxItem IsSelected="True">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock>Обход в глубину</TextBlock>
@@ -39,9 +39,14 @@
                 </StackPanel>
             </ComboBoxItem>
         </ComboBox>
-    </Grid> 
+        <Label Content="Выберите режим:" HorizontalAlignment="Left" Margin="746,22,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <RadioButton Content="Обучающий" HorizontalAlignment="Left" Margin="746,51,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked" FontSize="14"/>
+        <RadioButton Content="Обычный" HorizontalAlignment="Left" Margin="746,72,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked" FontSize="14"/>
+        <Button Content="Запустить" HorizontalAlignment="Left" Margin="746,152,0,0" VerticalAlignment="Top" Width="165" FontSize="14"/>
+    </Grid>
 
 </Window>
+
 
 
     
