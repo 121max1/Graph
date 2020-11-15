@@ -5,24 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GraphVisual"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1000
-        ">
+        Title="MainWindow" Height="770" Width="1228">
     <Grid>
-        <Canvas  Name ="GraphCanvas" HorizontalAlignment="Left" Height="392" Margin="86,22,0,0" VerticalAlignment="Top" Width="647" MouseLeftButtonDown="Canvas_MouseLeftButtonDown"/>
+        <Border BorderThickness="3" BorderBrush="Black" Margin="88,20,0,0"  HorizontalAlignment="Left" VerticalAlignment="Top" Height="438" Width="923">
+            <Canvas  Name ="GraphCanvas" Height="430" VerticalAlignment="Top" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" Margin="0,0,0,-44" Background="Transparent"/>
+        </Border>
         <Button Name="AddVertexButton" HorizontalAlignment="Left" Margin="7,22,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52" Click="AddVertexButton_Click">
             <Image Source = "Resources/AddVertexImage.png" Width="69" Height="52"/>
         </Button>
-        <Button Name ="AddEdgeButton"  HorizontalAlignment="Left" Margin="7,82,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
+        <Button Name ="AddEdgeButton"  HorizontalAlignment="Left" Margin="7,82,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52" Click="AddEdgeButton_Click">
             <Image Source = "Resources/AddEdgeImage.png" Width="69" Height="52"/>
         </Button>
-        <Button Name="DeleteButton" HorizontalAlignment="Left" Margin="7,142,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
+        <Button Name="DeleteButton" HorizontalAlignment="Left" Margin="7,142,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52" Click="DeleteButton_Click">
             <Image Source = "Resources/DeleteButtonImage.jpg" Width="69" Height="52"/>
         </Button>
-        <Button Name="SelectVertexButton" HorizontalAlignment="Left" Margin="7,203,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52">
+        <Button Name="SelectVertexButton" HorizontalAlignment="Left" Margin="7,203,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52" Click="SelectVertexButton_Click">
             <Image Source = "Resources/SelectVertexImage.jpg" Width="69" Height="52"/>
         </Button>
-        <Label Content="Выберите алгоритм:" HorizontalAlignment="Left" Margin="746,88,0,0" VerticalAlignment="Top" Width="142" RenderTransformOrigin="0.059,-1.331" FontSize="14"/>
-        <ComboBox HorizontalAlignment="Left" Margin="746,122,0,0" VerticalAlignment="Top" Width="165" IsSynchronizedWithCurrentItem="False" FontSize="14">
+        <Label Content="Выберите алгоритм:" HorizontalAlignment="Left" Margin="1029,88,0,0" VerticalAlignment="Top" Width="145" RenderTransformOrigin="0.059,-1.331" FontSize="14"/>
+        <ComboBox HorizontalAlignment="Left" Margin="1029,122,0,0" VerticalAlignment="Top" Width="168" IsSynchronizedWithCurrentItem="False" FontSize="14">
             <ComboBoxItem IsSelected="True">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock>Обход в глубину</TextBlock>
@@ -39,10 +40,10 @@
                 </StackPanel>
             </ComboBoxItem>
         </ComboBox>
-        <Label Content="Выберите режим:" HorizontalAlignment="Left" Margin="746,22,0,0" VerticalAlignment="Top" FontSize="14"/>
-        <RadioButton Content="Обучающий" HorizontalAlignment="Left" Margin="746,51,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked" FontSize="14"/>
-        <RadioButton Content="Обычный" HorizontalAlignment="Left" Margin="746,72,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked" FontSize="14"/>
-        <Button Content="Запустить" HorizontalAlignment="Left" Margin="746,152,0,0" VerticalAlignment="Top" Width="165" FontSize="14"/>
+        <Label Content="Выберите режим:" HorizontalAlignment="Left" Margin="1029,22,0,0" VerticalAlignment="Top" FontSize="14" Width="126"/>
+        <RadioButton Content="Обучающий" HorizontalAlignment="Left" Margin="1029,51,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked" FontSize="14" Width="101"/>
+        <RadioButton Content="Обычный" HorizontalAlignment="Left" Margin="1029,72,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked" FontSize="14" Width="83"/>
+        <Button Content="Запустить" HorizontalAlignment="Left" Margin="1029,152,0,0" VerticalAlignment="Top" Width="168" FontSize="14"/>
     </Grid>
 
 </Window>

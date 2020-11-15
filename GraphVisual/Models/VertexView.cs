@@ -8,13 +8,13 @@ namespace GraphVisual.Models
 {
     class VertexView
     {
-        public int X { get; set; }
-        public int Y { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
 
         public string Name { get; set; }
 
         public int Number { get; set; }
 
-        public static int Radius { get; set; }
+        public static int Radius = 10;
     }
 }
