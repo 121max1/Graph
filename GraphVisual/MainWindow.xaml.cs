@@ -25,6 +25,7 @@ namespace GraphVisual
         private bool _addEdgeButtonIsPressed = false;
         private bool _deleteButtonIsPressed = false;
         private bool _selectVertexButtonIsPressed = false;
+        private List<Ellipse> _selectedVertexs = new List<Ellipse>();
         private static int _cntVertex = 1;
         public MainWindow()
         {
@@ -60,30 +61,48 @@ namespace GraphVisual
             }
             else if (_deleteButtonIsPressed)
             {
-                double mx = e.GetPosition(GraphCanvas).X;
-                double my = e.GetPosition(GraphCanvas).Y;
                 foreach (UIElement child in GraphCanvas.Children)
                 {
                     if (child is Ellipse ellipse)
                     {
-                        child.MouseLeftButtonDown += Child_MouseLeftButtonDown;
+                        child.MouseLeftButtonDown += ChildDelete_MouseLeftButtonDown; ;
+                    }
+                }
+            }
+            else if(_addEdgeButtonIsPressed)
+            {
+                foreach (UIElement child in GraphCanvas.Children)
+                {
+                    if (child is Ellipse ellipse)
+                    {
+                        child.MouseLeftButtonDown += ChildSelect_MouseLeftButtonDown;
+                    }
+                }
+                if (_selectedVertexs.Count == 2)
+                {
+                    AddNewEdgeWindow addNewEdgeWindow = new AddNewEdgeWindow();
+                    EdgeView edge = new EdgeView()
+                    if(addNewEdgeWindow.ShowDialog() == true)
+                    {
+                        addNewEdgeWindow.Distance
                     }
                 }
             }
         }
 
-        private void Child_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ChildDelete_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Ellipse ellipse = sender as Ellipse;
             if (ellipse != null)
             {
                 GraphCanvas.Children.Remove(ellipse);
+                _selectedVertexs.Remove(ellipse);
                 TextBlock to_delete = new TextBlock();
-                foreach(UIElement child in GraphCanvas.Children)
+                foreach (UIElement child in GraphCanvas.Children)
                 {
                     if (child is TextBlock textBlock)
                     {
-                        if(textBlock.Tag == ellipse.Tag)
+                        if (textBlock.Tag == ellipse.Tag)
                         {
                             to_delete = textBlock;
                         }
@@ -92,6 +111,30 @@ namespace GraphVisual
                 GraphCanvas.Children.Remove(to_delete);
             }
         }
+
+        private void ChildSelect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Ellipse ellipse = sender as Ellipse;
+            if (ellipse != null)
+            {
+                ellipse.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 140));
+                if (_selectedVertexs.Count <3)
+                {
+                    _selectedVertexs.Add(ellipse);
+                }
+                else
+                {
+                    foreach(var elps in _selectedVertexs)
+                    {
+                        elps.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                    }
+                    _selectedVertexs.Clear();
+                }
+            }
+        }
+    
+
+    
 
         private void RenderVerter(VertexView vertex, Color color)
         {
@@ -119,6 +162,14 @@ namespace GraphVisual
             GraphCanvas.Children.Add(text);
             
         }
+
+
+
+        private void RenderEdge(EdgeView edge,Color color)
+        {
+
+        }
+        
 
         private void AddVertexButton_Click(object sender, RoutedEventArgs e)
         {

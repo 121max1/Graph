@@ -16,5 +16,6 @@ namespace GraphVisual.Models
         public int Number { get; set; }
 
         public static int Radius = 10;
+
     }
 }
