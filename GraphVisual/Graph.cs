@@ -7,11 +7,59 @@ using System.Threading.Tasks;
 
 namespace GraphVisual
 {
-    class Graph
+    class Graph 
     {
         public SortedSet<VertexView> V { get; set; } = new SortedSet<VertexView>();
         public List<EdgeView> E { get; set; } = new List<EdgeView>();
 
+        public static int cntVertix = 1;
+        public void AddVertex(VertexView vertex)
+        {
+            V.Add(vertex);
+            cntVertix += 1;
+        }
+        public void DeleteVertex(VertexView vertex)
+        {
+            var edgesToDelete = new List<EdgeView>();
+            foreach (var edge in E)
+            {
+                if (edge.V1.Number == vertex.Number || edge.V2.Number == vertex.Number)
+                {
+                    edgesToDelete.Add(edge);
+                }
+            }
+            foreach (var edge in edgesToDelete)
+            {
+                E.Remove(edge);
+            }
+            foreach (var edge in E)
+            {
+                if (edge.V1.Number > vertex.Number)
+                {
+                    edge.V1.Number -= 1;
+                }
+                if (edge.V2.Number > vertex.Number)
+                {
+                    edge.V2.Number -= 1;
+                }
+            }
+            V.Remove(vertex);
+        }
 
+        public void AddEdge(EdgeView edge)
+        {
+            foreach (var e in E)
+            {
+                if (e.V1.Number == edge.V1.Number && e.V2.Number == edge.V2.Number)
+                {
+                    throw new Exception("Edge is already exists");
+                }
+            }
+            E.Add(edge);
+        }
+        public VertexView GetVertexByNumber(int number)
+        {
+            return V.Where(vert => vert.Number == number).FirstOrDefault();
+        }
     }
 }

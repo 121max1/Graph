@@ -39,9 +39,15 @@ namespace GraphVisual
             get { return int.Parse(DistanceTextBox.Text); }
         }
 
-        public bool? Oriented
+        public bool? IsOriented
         {
             get { return OrientedEdgeRadioButton.IsChecked; }
+        }
+
+        private void SubmitButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = true;
+            this.Close();
         }
     }
 }

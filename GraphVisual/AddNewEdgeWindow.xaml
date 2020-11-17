@@ -5,14 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GraphVisual"
         mc:Ignorable="d"
-        Title="Тип Ребра" Height="149" Width="191.001">
-    <Grid Margin="0,0,4,0">
-        <Label Content="Введите расстояние:" HorizontalAlignment="Left" Margin="2,5,0,0" VerticalAlignment="Top"/>
-        <TextBox Name="DistanceTextBox" HorizontalAlignment="Left" Height="15" Margin="124,11,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="45" TextChanged="TextBox_TextChanged"/>
-        <Label Content="Тип ребра:" HorizontalAlignment="Left" Margin="3,24,0,0" VerticalAlignment="Top"/>
-        <RadioButton Name ="OrientedEdgeRadioButton" Content="Ориентрированное" HorizontalAlignment="Left" Margin="7,48,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.404,0.6"/>
-        <RadioButton Content="Неориентированное" HorizontalAlignment="Left" Margin="7,65,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.404,0.6" Checked="RadioButton_Checked"/>
-        <Button Content="Подтвердить" HorizontalAlignment="Left" Margin="8,91,0,0" VerticalAlignment="Top" Width="166"/>
+        Title="Тип Ребра" Height="162.969" Width="210.557">
+    <Grid Margin="0,0,2,0">
+        <Label Content="Введите расстояние:" HorizontalAlignment="Left" Margin="2,5,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <TextBox Name="DistanceTextBox" HorizontalAlignment="Left" Height="20" Margin="143,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="45" TextChanged="TextBox_TextChanged" Text="1"/>
+        <Label Content="Тип ребра:" HorizontalAlignment="Left" Margin="3,24,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <RadioButton Name ="OrientedEdgeRadioButton" Content="Ориентрированное" HorizontalAlignment="Left" Margin="7,48,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.404,0.6" FontSize="14"/>
+        <RadioButton Content="Неориентированное" HorizontalAlignment="Left" Margin="7,65,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.404,0.6" Checked="RadioButton_Checked" IsChecked="True" FontSize="14"/>
+        <Button Name="SubmitButton" Content="Подтвердить" HorizontalAlignment="Left" Margin="8,91,0,0" VerticalAlignment="Top" Width="166" Click="SubmitButton_Click" FontSize="14"/>
 
     </Grid>
 </Window>

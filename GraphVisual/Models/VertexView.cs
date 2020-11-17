@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GraphVisual.Models
 {
-    class VertexView
+    class VertexView : IComparable
     {
         public double X { get; set; }
         public double Y { get; set; }
@@ -17,5 +17,18 @@ namespace GraphVisual.Models
 
         public static int Radius = 10;
 
+        public int CompareTo(object obj)
+        {
+            VertexView v = obj as VertexView;
+            if (obj != null)
+            {
+                return this.Number.CompareTo(v.Number);
+            }
+            else
+                throw new Exception("Невозможно сравнить два объекта");
+        }
+        
     }
+
+    
 }

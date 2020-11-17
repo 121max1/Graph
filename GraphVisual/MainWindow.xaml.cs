@@ -26,7 +26,7 @@ namespace GraphVisual
         private bool _deleteButtonIsPressed = false;
         private bool _selectVertexButtonIsPressed = false;
         private List<Ellipse> _selectedVertexs = new List<Ellipse>();
-        private static int _cntVertex = 1;
+        private readonly Graph _graph = new Graph();
         public MainWindow()
         {
             InitializeComponent();
@@ -52,11 +52,10 @@ namespace GraphVisual
                 {
                     X = e.GetPosition(GraphCanvas).X,
                     Y = e.GetPosition(GraphCanvas).Y,
-                    Name = _cntVertex.ToString(),
-                    Number = _cntVertex
+                    Name = Graph.cntVertix.ToString(),
+                    Number = Graph.cntVertix
                 };
-                _cntVertex += 1;
-           
+                _graph.AddVertex(vertexView);
                 RenderVerter(vertexView,Color.FromRgb(140,0,0));
             }
             else if (_deleteButtonIsPressed)
@@ -81,10 +80,19 @@ namespace GraphVisual
                 if (_selectedVertexs.Count == 2)
                 {
                     AddNewEdgeWindow addNewEdgeWindow = new AddNewEdgeWindow();
-                    EdgeView edge = new EdgeView()
-                    if(addNewEdgeWindow.ShowDialog() == true)
+                    if (addNewEdgeWindow.ShowDialog() == true)
                     {
-                        addNewEdgeWindow.Distance
+                        EdgeView edge = new EdgeView(
+                            _graph.GetVertexByNumber((int)_selectedVertexs[0].Tag),
+                            _graph.GetVertexByNumber((int)_selectedVertexs[1].Tag),
+                            addNewEdgeWindow.Distance);
+                        _graph.AddEdge(edge);
+                        RenderEdge(addNewEdgeWindow.IsOriented, edge);
+                        foreach (var elps in _selectedVertexs)
+                        {
+                            elps.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                        }
+                        _selectedVertexs.Clear();
                     }
                 }
             }
@@ -110,16 +118,26 @@ namespace GraphVisual
                 }
                 GraphCanvas.Children.Remove(to_delete);
             }
+            _graph.DeleteVertex(_graph.GetVertexByNumber((int)ellipse.Tag));
+            
         }
 
         private void ChildSelect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Ellipse ellipse = sender as Ellipse;
-            if (ellipse != null)
+            bool addToSelectedVertexFlag = true;
+            foreach(var elps in _selectedVertexs)
             {
-                ellipse.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 140));
-                if (_selectedVertexs.Count <3)
+                if (ellipse.Tag.ToString() == elps.Tag.ToString())
                 {
+                    addToSelectedVertexFlag = false;
+                }
+            }
+            if (ellipse != null && addToSelectedVertexFlag)
+            {
+                if (_selectedVertexs.Count < 2)
+                {
+                    ellipse.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 140));
                     _selectedVertexs.Add(ellipse);
                 }
                 else
@@ -136,7 +154,7 @@ namespace GraphVisual
 
     
 
-        private void RenderVerter(VertexView vertex, Color color)
+        private Ellipse RenderVerter(VertexView vertex, Color color)
         {
             Ellipse ellipse = new Ellipse()
             {
@@ -160,16 +178,126 @@ namespace GraphVisual
             Canvas.SetLeft(text, vertex.X - 10);
             Canvas.SetTop(text, vertex.Y + 10);
             GraphCanvas.Children.Add(text);
-            
+            return ellipse;
         }
 
 
 
-        private void RenderEdge(EdgeView edge,Color color)
+        private void RenderEdge(bool? isOriented, EdgeView edge)
         {
-
+            if(isOriented == true)
+            {
+                RenderOrientedEdge(edge);
+            }
+            else
+            {
+                RenderNonOrientedEdge(edge);
+            }
         }
         
+        private void RenderOrientedEdge(EdgeView edge)
+        {
+            double theta = Math.Atan2(edge.V1.Y - edge.V2.Y, edge.V1.X - edge.V2.X);
+            double sint = Math.Sin(theta);
+            double cost = Math.Cos(theta);
+            double HeadWidth = 50;
+            double HeadHeight = 5;
+
+            Point pt1 = new Point(edge.V1.X - VertexView.Radius / 2, edge.V1.Y - VertexView.Radius / 2);
+            Point pt2 = new Point(edge.V2.X - VertexView.Radius / 2, edge.V2.Y - VertexView.Radius / 2);
+
+            Point pt3 = new Point(
+                pt2.X + (HeadWidth * cost - HeadHeight * sint),
+                pt2.Y + (HeadWidth * sint + HeadHeight * cost));
+
+            Point pt4 = new Point(
+                pt2.X + (HeadWidth * cost + HeadHeight * sint),
+                pt2.Y - (HeadHeight * cost - HeadWidth * sint));
+
+            Line mainLine = new Line();
+            mainLine.X1 = pt1.X;
+            mainLine.Y1 = pt1.Y;
+
+            mainLine.X2 = pt2.X;
+            mainLine.Y2 = pt2.Y;
+            mainLine.Stroke = new SolidColorBrush(Color.FromRgb(0,0,0));
+            mainLine.StrokeThickness = 2;
+            GraphCanvas.Children.Add(mainLine);
+
+            Line arrowLine1 = new Line();
+            arrowLine1.X1 = pt2.X;
+            arrowLine1.Y1 = pt2.Y;
+
+            arrowLine1.X2 = pt3.X;
+            arrowLine1.Y2 = pt3.Y;
+            arrowLine1.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
+            arrowLine1.StrokeThickness = 2;
+            GraphCanvas.Children.Add(arrowLine1);
+
+            Line arrowLine2 = new Line();
+            arrowLine2.X1 = pt2.X;
+            arrowLine2.Y1 = pt2.Y;
+
+            arrowLine2.X2 = pt4.X;
+            arrowLine2.Y2 = pt4.Y;
+            arrowLine2.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
+            arrowLine2.StrokeThickness = 2;
+            GraphCanvas.Children.Add(arrowLine2);
+
+            Point pt5 = new Point(
+                Math.Abs(pt2.X + pt1.X) / 2,
+                Math.Abs(pt2.Y + pt1.Y) / 2);
+
+            TextBlock textBlock = new TextBlock();
+            textBlock.Text = edge.Distance.ToString();
+            textBlock.FontSize = 15;
+            textBlock.Foreground = new SolidColorBrush(Color.FromRgb(0, 0, 0));
+            Canvas.SetLeft(textBlock, pt5.X);
+            Canvas.SetTop(textBlock, pt5.Y);
+            GraphCanvas.Children.Add(textBlock);
+        }
+
+        private void RenderNonOrientedEdge(EdgeView edge)
+        {
+            double theta = Math.Atan2(edge.V1.Y - edge.V2.Y, edge.V1.X - edge.V2.X);
+            double sint = Math.Sin(theta);
+            double cost = Math.Cos(theta);
+            double HeadWidth = 50;
+            double HeadHeight = 5;
+
+            Point pt1 = new Point(edge.V1.X - VertexView.Radius / 2, edge.V1.Y - VertexView.Radius / 2);
+            Point pt2 = new Point(edge.V2.X - VertexView.Radius / 2, edge.V2.Y - VertexView.Radius / 2);
+
+            Point pt3 = new Point(
+                pt2.X + (HeadWidth * cost - HeadHeight * sint),
+                pt2.Y + (HeadWidth * sint + HeadHeight * cost));
+
+            Point pt4 = new Point(
+                pt2.X + (HeadWidth * cost + HeadHeight * sint),
+                pt2.Y - (HeadHeight * cost - HeadWidth * sint));
+
+            Line mainLine = new Line();
+            mainLine.X1 = pt1.X;
+            mainLine.Y1 = pt1.Y;
+
+            mainLine.X2 = pt2.X;
+            mainLine.Y2 = pt2.Y;
+            mainLine.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
+            mainLine.StrokeThickness = 2;
+            GraphCanvas.Children.Add(mainLine);
+
+            Point pt5 = new Point(
+                Math.Abs(pt2.X + pt1.X) / 2,
+                Math.Abs(pt2.Y + pt1.Y) / 2);
+
+            TextBlock textBlock = new TextBlock();
+            textBlock.Text = edge.Distance.ToString();
+            textBlock.FontSize = 15;
+            textBlock.Foreground = new SolidColorBrush(Color.FromRgb(0, 0, 0));
+            Canvas.SetLeft(textBlock, pt5.X);
+            Canvas.SetTop(textBlock, pt5.Y);
+            GraphCanvas.Children.Add(textBlock);
+        }
 
         private void AddVertexButton_Click(object sender, RoutedEventArgs e)
         {
