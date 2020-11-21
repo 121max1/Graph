@@ -25,7 +25,9 @@ namespace GraphVisual
         private bool _addEdgeButtonIsPressed = false;
         private bool _deleteButtonIsPressed = false;
         private bool _selectVertexButtonIsPressed = false;
+        private bool _alreadyDeleted = false;
         private List<Ellipse> _selectedVertexs = new List<Ellipse>();
+        private List<Line> _linesOnCanvas = new List<Line>();
         private readonly Graph _graph = new Graph();
         public MainWindow()
         {
@@ -56,7 +58,7 @@ namespace GraphVisual
                     Number = Graph.cntVertix
                 };
                 _graph.AddVertex(vertexView);
-                RenderVerter(vertexView,Color.FromRgb(140,0,0));
+                RenderVertex(vertexView,Color.FromRgb(140,0,0));
             }
             else if (_deleteButtonIsPressed)
             {
@@ -64,9 +66,15 @@ namespace GraphVisual
                 {
                     if (child is Ellipse ellipse)
                     {
-                        child.MouseLeftButtonDown += ChildDelete_MouseLeftButtonDown; ;
+                        child.MouseLeftButtonDown += ChildDeleteElipse_MouseLeftButtonDown;
                     }
+                    if(child is Line edge)
+                    {
+                        child.MouseRightButtonDown += ChildDeleteEdge_MouseRightButtonDown;
+                    }    
+
                 }
+                _alreadyDeleted = false;
             }
             else if(_addEdgeButtonIsPressed)
             {
@@ -74,7 +82,7 @@ namespace GraphVisual
                 {
                     if (child is Ellipse ellipse)
                     {
-                        child.MouseLeftButtonDown += ChildSelect_MouseLeftButtonDown;
+                        child.MouseLeftButtonDown += AddEdgeLine_MouseLeftButtonDown;
                     }
                 }
                 if (_selectedVertexs.Count == 2)
@@ -82,11 +90,62 @@ namespace GraphVisual
                     AddNewEdgeWindow addNewEdgeWindow = new AddNewEdgeWindow();
                     if (addNewEdgeWindow.ShowDialog() == true)
                     {
-                        EdgeView edge = new EdgeView(
-                            _graph.GetVertexByNumber((int)_selectedVertexs[0].Tag),
-                            _graph.GetVertexByNumber((int)_selectedVertexs[1].Tag),
-                            addNewEdgeWindow.Distance);
-                        _graph.AddEdge(edge);
+                        var V1 = _graph.GetVertexByNumber((int)_selectedVertexs[0].Tag);
+                        var V2 = _graph.GetVertexByNumber((int)_selectedVertexs[1].Tag);
+                        EdgeView edge = new EdgeView()
+                        {
+
+                            V1 = new VertexView() { Name = V1.Name, Number = V1.Number, X = V1.X, Y = V1.Y },
+                            V2 = new VertexView() { Name = V2.Name, Number = V2.Number, X = V2.X, Y = V2.Y },
+                            Distance = addNewEdgeWindow.Distance,
+                            IsOriented = addNewEdgeWindow.IsOriented
+                        };
+
+                        try
+                        {
+                            _graph.AddEdge(edge);
+                        }
+                        catch(Exception excp)
+                        {
+                            if (excp.Message == "Edge is already exists")
+                            {
+                                foreach (var elps in _selectedVertexs)
+                                {
+                                    elps.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                                }
+                                _selectedVertexs.Clear();
+                                return;
+                            }
+                            else if(excp.Message == "Add new nonOriented edge")
+                            {
+                                List<Line> linesToDelete = new List<Line>();
+                                foreach (UIElement child in GraphCanvas.Children)
+                                {
+                                    if (child is Line line)
+                                    {
+                                        int firstVertexNumber = int.Parse(line.Tag.ToString().Split()[0]);
+                                        int secondVertexNumber = int.Parse(line.Tag.ToString().Split()[1]);
+                                        
+                                        if (firstVertexNumber == edge.V2.Number && secondVertexNumber == edge.V1.Number)
+                                        {
+                                            linesToDelete.Add(line);
+                                            
+                                        }
+                                    }
+                                }
+                                foreach (var line in linesToDelete)
+                                {
+                                    GraphCanvas.Children.Remove(line);
+                                }    
+                                foreach (var elps in _selectedVertexs)
+                                {
+                                    elps.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                                }
+                                _selectedVertexs.Clear();
+                                RenderEdge(false, edge);
+                                return;
+                            }
+                        }
                         RenderEdge(addNewEdgeWindow.IsOriented, edge);
                         foreach (var elps in _selectedVertexs)
                         {
@@ -98,79 +157,134 @@ namespace GraphVisual
             }
         }
 
-        private void ChildDelete_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        
+
+        private void AddEdgeLine_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Ellipse ellipse = sender as Ellipse;
-            if (ellipse != null)
+            if (_addEdgeButtonIsPressed)
             {
-                GraphCanvas.Children.Remove(ellipse);
-                _selectedVertexs.Remove(ellipse);
-                TextBlock toDelete = new TextBlock();
-                List<Line> linesToDelete = new List<Line>();
-                foreach (UIElement child in GraphCanvas.Children)
+                Ellipse ellipse = sender as Ellipse;
+                bool addToSelectedVertexFlag = true;
+                foreach (var elps in _selectedVertexs)
                 {
-                    if (child is TextBlock textBlock)
+                    if (ellipse.Tag.ToString() == elps.Tag.ToString())
                     {
-                        if (textBlock.Tag == ellipse.Tag)
-                        {
-                            toDelete = textBlock;
-                        }
-                        
+                        addToSelectedVertexFlag = false;
                     }
-                    else if( child is Line line)
+                }
+                if (ellipse != null && addToSelectedVertexFlag)
+                {
+                    if (_selectedVertexs.Count < 2)
                     {
-                        int firstVertexNumber = int.Parse(line.Tag.ToString().Split()[0]);
-                        int secondVertexNumber = int.Parse(line.Tag.ToString().Split()[0]);
-                        if ((int)ellipse.Tag == firstVertexNumber || (int)ellipse.Tag == secondVertexNumber)
+                        ellipse.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 140));
+                        _selectedVertexs.Add(ellipse);
+                    }
+                    else
+                    {
+                        foreach (var elps in _selectedVertexs)
+                        {
+                            elps.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                        }
+                        _selectedVertexs.Clear();
+                    }
+                }
+            }
+        }
+        private void ChildDeleteEdge_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Line edge = sender as Line;
+            if (edge != null)
+            {
+                List<Line> linesToDelete = new List<Line>();
+                foreach (UIElement element in GraphCanvas.Children)
+                {
+                    if (element is Line line)
+                    {
+                        if (line.Tag == edge.Tag)
                         {
                             linesToDelete.Add(line);
                         }
                     }
                 }
-                GraphCanvas.Children.Remove(toDelete);
-                foreach(Line line in linesToDelete)
+                foreach (var line in linesToDelete)
                 {
                     GraphCanvas.Children.Remove(line);
                 }
+                int v1 = int.Parse(edge.Tag.ToString().Split()[0]);
+                int v2 = int.Parse(edge.Tag.ToString().Split()[1]);
 
+                _graph.DeleteEdge(v1, v2);
             }
-            _graph.DeleteVertex(_graph.GetVertexByNumber((int)ellipse.Tag));
-            
         }
-
-        private void ChildSelect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ChildDeleteElipse_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Ellipse ellipse = sender as Ellipse;
-            bool addToSelectedVertexFlag = true;
-            foreach(var elps in _selectedVertexs)
+            if (_deleteButtonIsPressed)
             {
-                if (ellipse.Tag.ToString() == elps.Tag.ToString())
+                Ellipse ellipse = sender as Ellipse;
+                if (ellipse != null)
                 {
-                    addToSelectedVertexFlag = false;
-                }
-            }
-            if (ellipse != null && addToSelectedVertexFlag)
-            {
-                if (_selectedVertexs.Count < 2)
-                {
-                    ellipse.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 140));
-                    _selectedVertexs.Add(ellipse);
-                }
-                else
-                {
-                    foreach(var elps in _selectedVertexs)
+                    GraphCanvas.Children.Remove(ellipse);
+                    _selectedVertexs.Remove(ellipse);
+                    List<TextBlock> textBlocksToDelete = new List<TextBlock>();
+                    List<Line> linesToDelete = new List<Line>();
+                    foreach (UIElement child in GraphCanvas.Children)
                     {
-                        elps.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                        if (child is TextBlock textBlock)
+                        {
+                            if (textBlock.Tag == ellipse.Tag)
+                            {
+                                textBlocksToDelete.Add(textBlock);
+                            }
+
+                        }
                     }
-                    _selectedVertexs.Clear();
+                    foreach (var child in GraphCanvas.Children)
+                    {
+                        if (child is Line line)
+                        {
+                            int firstVertexNumber = int.Parse(line.Tag.ToString().Split()[0]);
+                            int secondVertexNumber = int.Parse(line.Tag.ToString().Split()[1]);
+                            if ((int)ellipse.Tag == firstVertexNumber || (int)ellipse.Tag == secondVertexNumber)
+                            {
+                                linesToDelete.Add(line);
+                            }
+                        }
+                        else if(child is TextBlock text)
+                        {
+                            if(text.Tag.ToString().Split().Length == 2)
+                            {
+                                int firstVertexNumber = int.Parse(text.Tag.ToString().Split()[0]);
+                                int secondVertexNumber = int.Parse(text.Tag.ToString().Split()[1]);
+                                if ((int)ellipse.Tag == firstVertexNumber || (int)ellipse.Tag == secondVertexNumber)
+                                {
+                                    textBlocksToDelete.Add(text);
+                                }
+                            }
+                        }
+                    }
+                    foreach (TextBlock text in textBlocksToDelete)
+                    {
+                        GraphCanvas.Children.Remove(text);
+                    }
+                    foreach (Line line in linesToDelete)
+                    {
+                        GraphCanvas.Children.Remove(line);
+                    }
+
+                }
+                if (!_alreadyDeleted)
+                {
+                    _graph.DeleteVertex(_graph.GetVertexByNumber((int)ellipse.Tag));
+                    _alreadyDeleted = true;
                 }
             }
         }
-    
 
     
 
-        private Ellipse RenderVerter(VertexView vertex, Color color)
+    
+
+        private Ellipse RenderVertex(VertexView vertex, Color color)
         {
             Ellipse ellipse = new Ellipse()
             {
@@ -240,6 +354,7 @@ namespace GraphVisual
             mainLine.StrokeThickness = 2;
             mainLine.Tag = edge.V1.Number + " " + edge.V2.Number;
             GraphCanvas.Children.Add(mainLine);
+            _linesOnCanvas.Add(mainLine);
 
             Line arrowLine1 = new Line();
             arrowLine1.X1 = pt2.X;
@@ -306,6 +421,7 @@ namespace GraphVisual
             mainLine.StrokeThickness = 2;
             mainLine.Tag = edge.V1.Number + " " + edge.V2.Number;
             GraphCanvas.Children.Add(mainLine);
+            _linesOnCanvas.Add(mainLine);
 
             Point pt5 = new Point(
                 Math.Abs(pt2.X + pt1.X) / 2,

@@ -32,6 +32,7 @@ namespace GraphVisual
             {
                 E.Remove(edge);
             }
+            // баг
             foreach (var edge in E)
             {
                 if (edge.V1.Number > vertex.Number)
@@ -44,16 +45,53 @@ namespace GraphVisual
                 }
             }
             V.Remove(vertex);
-        }
 
+        }
+        public void DeleteEdge(int v1, int v2)
+        {
+            EdgeView edgeToDelete = null;
+            foreach (var edge in E)
+            {
+                if (edge.V1.Number == v1 && edge.V2.Number == v2)
+                {
+                    edgeToDelete = edge;
+                    E.Remove(edgeToDelete);
+                    break;
+                }
+            }
+            if(edgeToDelete.IsOriented == false)
+            {
+                foreach (var edge in E)
+                {
+                    if (edge.V1.Number == v2 && edge.V2.Number == v1)
+                    {
+                         E.Remove(edge);
+                    }
+                }
+            }    
+        }
         public void AddEdge(EdgeView edge)
         {
             foreach (var e in E)
             {
-                if (e.V1.Number == edge.V1.Number && e.V2.Number == edge.V2.Number)
+          
+                if (edge.IsOriented == true && e.V1.Number == edge.V1.Number && e.V2.Number == edge.V2.Number
+                    || edge.IsOriented == false && (e.V1.Number == edge.V1.Number && e.V2.Number == edge.V2.Number
+                    || e.V2.Number == edge.V1.Number && e.V1.Number == edge.V2.Number) )
                 {
                     throw new Exception("Edge is already exists");
                 }
+                else if (edge.IsOriented == true && e.V1.Number == edge.V2.Number && e.V2.Number == edge.V1.Number)
+                {
+                    E.Add(edge);
+                    throw new Exception("Add new nonOriented edge");
+                }
+            }
+            if(edge.IsOriented == false)
+            {
+                VertexView v1 = edge.V2;
+                VertexView v2 = edge.V1;
+                E.Add(new EdgeView() { V1 = v2, V2 = v1, Distance = edge.Distance, IsOriented = edge.IsOriented }) ;
             }
             E.Add(edge);
         }
