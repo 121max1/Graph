@@ -65,7 +65,8 @@ namespace GraphVisual
                 {
                     if (edge.V1.Number == v2 && edge.V2.Number == v1)
                     {
-                         E.Remove(edge);
+                        E.Remove(edge);
+                        break;
                     }
                 }
             }    
@@ -89,9 +90,7 @@ namespace GraphVisual
             }
             if(edge.IsOriented == false)
             {
-                VertexView v1 = edge.V2;
-                VertexView v2 = edge.V1;
-                E.Add(new EdgeView() { V1 = v2, V2 = v1, Distance = edge.Distance, IsOriented = edge.IsOriented }) ;
+                E.Add(new EdgeView() { V1 = edge.V2, V2 = edge.V1, Distance = edge.Distance, IsOriented = edge.IsOriented }) ;
             }
             E.Add(edge);
         }

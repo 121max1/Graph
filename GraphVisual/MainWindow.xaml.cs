@@ -196,13 +196,21 @@ namespace GraphVisual
             if (edge != null)
             {
                 List<Line> linesToDelete = new List<Line>();
+                TextBlock _textBlockToDelete = new TextBlock();
                 foreach (UIElement element in GraphCanvas.Children)
                 {
                     if (element is Line line)
                     {
-                        if (line.Tag == edge.Tag)
+                        if (line.Tag.ToString() == edge.Tag.ToString())
                         {
                             linesToDelete.Add(line);
+                        }
+                    }
+                    else if(element is TextBlock textBlock)
+                    {
+                        if(textBlock.Tag.ToString() == edge.Tag.ToString())
+                        {
+                            _textBlockToDelete = textBlock;
                         }
                     }
                 }
@@ -210,6 +218,7 @@ namespace GraphVisual
                 {
                     GraphCanvas.Children.Remove(line);
                 }
+                GraphCanvas.Children.Remove(_textBlockToDelete);
                 int v1 = int.Parse(edge.Tag.ToString().Split()[0]);
                 int v2 = int.Parse(edge.Tag.ToString().Split()[1]);
 
@@ -351,7 +360,7 @@ namespace GraphVisual
             mainLine.X2 = pt2.X;
             mainLine.Y2 = pt2.Y;
             mainLine.Stroke = new SolidColorBrush(Color.FromRgb(0,0,0));
-            mainLine.StrokeThickness = 2;
+            mainLine.StrokeThickness = 4;
             mainLine.Tag = edge.V1.Number + " " + edge.V2.Number;
             GraphCanvas.Children.Add(mainLine);
             _linesOnCanvas.Add(mainLine);
@@ -363,7 +372,7 @@ namespace GraphVisual
             arrowLine1.X2 = pt3.X;
             arrowLine1.Y2 = pt3.Y;
             arrowLine1.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-            arrowLine1.StrokeThickness = 2;
+            arrowLine1.StrokeThickness = 4;
             arrowLine1.Tag = edge.V1.Number + " " + edge.V2.Number;
             GraphCanvas.Children.Add(arrowLine1);
 
@@ -374,7 +383,7 @@ namespace GraphVisual
             arrowLine2.X2 = pt4.X;
             arrowLine2.Y2 = pt4.Y;
             arrowLine2.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-            arrowLine2.StrokeThickness = 2;
+            arrowLine2.StrokeThickness = 4;
             arrowLine2.Tag = edge.V1.Number + " " + edge.V2.Number;
             GraphCanvas.Children.Add(arrowLine2);
 
@@ -418,7 +427,7 @@ namespace GraphVisual
             mainLine.X2 = pt2.X;
             mainLine.Y2 = pt2.Y;
             mainLine.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-            mainLine.StrokeThickness = 2;
+            mainLine.StrokeThickness = 4;
             mainLine.Tag = edge.V1.Number + " " + edge.V2.Number;
             GraphCanvas.Children.Add(mainLine);
             _linesOnCanvas.Add(mainLine);

@@ -15,7 +15,7 @@ namespace GraphVisual.Models
 
         public int Number { get; set; }
 
-        public static int Radius = 10;
+        public static int Radius = 12;
 
         public int CompareTo(object obj)
         {
