@@ -26,6 +26,7 @@ namespace GraphVisual
         private bool _deleteButtonIsPressed = false;
         private bool _selectVertexButtonIsPressed = false;
         private bool _alreadyDeleted = false;
+        private Ellipse _selectedVertex;
         private List<Ellipse> _selectedVertexs = new List<Ellipse>();
         private List<Line> _linesOnCanvas = new List<Line>();
         private readonly Graph _graph = new Graph();
@@ -155,9 +156,33 @@ namespace GraphVisual
                     }
                 }
             }
+            if(_selectVertexButtonIsPressed)
+            {
+                foreach (UIElement child in GraphCanvas.Children)
+                {
+                    if (child is Ellipse ellipse)
+                    {
+                        child.MouseLeftButtonDown += ChildSelectVertexButton_MouseLeftButtonDown; ;
+                    }
+                }
+            }
         }
 
-        
+        private void ChildSelectVertexButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Ellipse vert = sender as Ellipse;
+            if (_selectVertexButtonIsPressed)
+            {
+                if(_selectedVertex != null)
+                {
+                    _selectedVertex.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                }
+                
+                _selectedVertex = vert;
+                vert.Stroke = new SolidColorBrush(Color.FromRgb(0, 140, 0));
+
+            }
+        }
 
         private void AddEdgeLine_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -517,6 +542,22 @@ namespace GraphVisual
                 AddVertexButton.IsEnabled = true;
                 AddEdgeButton.IsEnabled = true;
                 DeleteButton.IsEnabled = true;
+                _selectedVertex.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                _selectedVertex = null;
+            }
+        }
+
+        private async void StartAlgorithmButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedVertexs != null)
+            {
+                if (chooseAlgComboBox.SelectedIndex == 0)
+                {
+                    foreach (var vertex in await _graph.DFS((int)_selectedVertex.Tag, GraphCanvas))
+                    {
+                        textBoxAnswer.Text += vertex.Name + "->";
+                    }
+                }
             }
         }
     }
