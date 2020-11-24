@@ -549,9 +549,10 @@ namespace GraphVisual
 
         private async void StartAlgorithmButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedVertexs != null)
+
+            if (chooseAlgComboBox.SelectedIndex == 0)
             {
-                if (chooseAlgComboBox.SelectedIndex == 0)
+                if (_selectedVertexs != null)
                 {
                     foreach (var vertex in await _graph.DFS((int)_selectedVertex.Tag, GraphCanvas))
                     {
@@ -559,6 +560,34 @@ namespace GraphVisual
                     }
                 }
             }
+            else if (chooseAlgComboBox.SelectedIndex == 1)
+            {
+               
+            }
+        }
+    
+
+        private void Reset_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (UIElement element in GraphCanvas.Children)
+            {
+                if(element is Line line)
+                {
+                    if (line.Tag == _selectedVertex.Tag)
+                    {
+                        line.Stroke = new SolidColorBrush(Color.FromRgb(0, 140, 0));
+                    }
+                    else
+                    {
+                        line.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
+                    }
+                }
+                if(element is Ellipse ellipse)
+                {
+                    ellipse.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                }
+            }
+            textBoxAnswer.Text = "";
         }
     }
 }

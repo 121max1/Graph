@@ -174,5 +174,92 @@ namespace GraphVisual
             }
             return toReturn;
         }
+        public Graph AlgBoruvka()
+        {
+            Graph T = new Graph();
+            T.V = V;
+
+            while (T.FindRelatedComponents().Count() != 1)
+            {
+                foreach (var relatedComponent in T.FindRelatedComponents())
+                {
+                    EdgeView minEdgeInRelatedComponent = FindMinEdgeInRelatedComponent(relatedComponent, FindEdgesInRalatedComponents(relatedComponent));
+                    if (minEdgeInRelatedComponent != null)
+                    {
+                        T.E.Add(minEdgeInRelatedComponent);
+                    }
+                }
+            }
+            return T.GetdisorientedGraph();
+        }
+        public IEnumerable<EdgeView> FindEdgesInRalatedComponents(IEnumerable<VertexView> component)
+        {
+            List<EdgeView> toReturn = new List<EdgeView>();
+            foreach (var edge in E)
+            {
+                foreach (var vert1 in component)
+                {
+                    foreach (var vert2 in component)
+                    { 
+                        if (edge.V1.Number == vert1.Number && edge.V2.Number == vert2.Number)
+                        {
+                            toReturn.Add(edge);
+                        }
+
+                    }
+                }
+            }
+            return toReturn;
+        }
+
+        private Edge FindMinEdgeInRelatedComponent(IEnumerable<Vertex> component, IEnumerable<Edge> edgesInComponent)
+        {
+            int min = E.Select(x => x.Distance).Max();
+            SortedSet<Edge> minEdgesInVertexs = new SortedSet<Edge>();
+            List<Edge> minEdges = new List<Edge>();
+            foreach (var vertex in component)
+            {
+                foreach (var edge in FindAdjacentEdges(vertex))
+                {
+                    if (edge.Distance <= min && !edgesInComponent.Contains(edge))
+                    {
+                        minEdges.Add(edge);
+                    }
+                }
+
+            }
+            return minEdges.OrderBy(edge => edge.Distance).FirstOrDefault();
+        }
+        public IEnumerable<IEnumerable<Vertex>> FindRelatedComponents()
+        {
+            List<Vertex> relations = new List<Vertex>();
+            V.ToList().ForEach(item => relations.Add(new Vertex(item.Number, item.Name)));
+            while (relations.Count != 0)
+            {
+                List<Vertex> comp = new List<Vertex>();
+                foreach (var v in DFS(relations.First().Name))
+                {
+                    comp.Add(v);
+                }
+                #region Mda
+                List<Vertex> _toRemove = new List<Vertex>();
+                foreach (var vert in relations)
+                {
+                    foreach (var v in comp)
+                    {
+                        if (v.Number == vert.Number)
+                        {
+                            _toRemove.Add(v);
+                        }
+                    }
+                }
+                foreach (var ver in _toRemove)
+                {
+                    relations.RemoveAll(x => x.Number == ver.Number);
+                }
+                #endregion
+                yield return comp;
+            }
+        }
     }
 }

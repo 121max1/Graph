@@ -31,7 +31,7 @@
             </ComboBoxItem>
             <ComboBoxItem IsSelected="True">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock>Обход в ширину</TextBlock>
+                    <TextBlock>Алгоритм Борувки</TextBlock>
                 </StackPanel>
             </ComboBoxItem>
             <ComboBoxItem IsSelected="True">
@@ -44,8 +44,9 @@
         <RadioButton Content="Обучающий" HorizontalAlignment="Left" Margin="1029,51,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked" FontSize="14" Width="101"/>
         <RadioButton Content="Обычный" HorizontalAlignment="Left" Margin="1029,72,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked" FontSize="14" Width="83"/>
         <Button Name ="StartAlgorithmButton" Content="Запустить" Margin="1029,152,23,0" VerticalAlignment="Top" FontSize="14" Click="StartAlgorithmButton_Click"/>
-        <Label Content="Текстовый ответ:" HorizontalAlignment="Left" Margin="1027,175,0,0" VerticalAlignment="Top" Width="124" FontSize="14"/>
-        <TextBox Name = "textBoxAnswer" Height="142" Margin="1031,204,23,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.242,-3"/>
+        <Label Content="Текстовый ответ:" HorizontalAlignment="Left" Margin="1028,198,0,0" VerticalAlignment="Top" Width="124" FontSize="14"/>
+        <TextBox Name = "textBoxAnswer" Height="142" Margin="1030,225,24,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.242,-3"/>
+        <Button x:Name ="Reset" Content="Очистить" Margin="1029,180,23,0" VerticalAlignment="Top" FontSize="14" Click="Reset_Click"/>
     </Grid>
 
 </Window>
