@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -116,6 +117,35 @@ namespace GraphVisual
             return adjacentVertexs;
         }
 
+        public IEnumerable<VertexView> DFS(VertexView v)
+        {
+            Stack<VertexView> stack = new Stack<VertexView>();
+            List<VertexView> toReturn = new List<VertexView>();
+            VertexView visited = V.Where(x => x.Number == v.Number).First();
+            stack.Push(visited);
+            toReturn.Add(visited);
+            SortedSet<VertexView> VisitedVertex = new SortedSet<VertexView>();
+            VisitedVertex.Add(visited);
+            while (stack.Count != 0)
+            {
+                VertexView s = stack.Pop();
+                if (!VisitedVertex.Contains(s))
+                {
+                    toReturn.Add(s);
+                }
+                VisitedVertex.Add(s);
+                foreach (var vert in FindАdjacentVertexs(v.Number).OrderByDescending(x => x.Number))
+                {
+                    if (!VisitedVertex.Contains(vert))
+                    {
+                        stack.Push(vert);
+          
+                    }
+                }
+            }
+            return toReturn;
+        }
+
         public async Task<IEnumerable<VertexView>> DFS(int v_num, Canvas graphCanvas)
         {
             Stack<VertexView> stack = new Stack<VertexView>();
@@ -174,23 +204,74 @@ namespace GraphVisual
             }
             return toReturn;
         }
-        public Graph AlgBoruvka()
+        public async Task<Graph> AlgBoruvka(Canvas graphCanvas)
         {
             Graph T = new Graph();
             T.V = V;
-
+            foreach (UIElement elem in graphCanvas.Children)
+            {
+                if (elem is Line line)
+                {
+                    
+                    elem.Visibility = Visibility.Hidden;
+                }
+                if(elem is TextBlock text)
+                {
+                    if (text.Text.ToString().Split().Length == 2)
+                    {
+                       
+                        elem.Visibility = Visibility.Hidden;
+                    }
+                }
+                
+            }
             while (T.FindRelatedComponents().Count() != 1)
             {
+                List<UIElement> linesToDraw = new List<UIElement>();
                 foreach (var relatedComponent in T.FindRelatedComponents())
                 {
                     EdgeView minEdgeInRelatedComponent = FindMinEdgeInRelatedComponent(relatedComponent, FindEdgesInRalatedComponents(relatedComponent));
                     if (minEdgeInRelatedComponent != null)
                     {
+                        foreach (UIElement elem in graphCanvas.Children)
+                        {
+                            if (elem is Line line)
+                            {
+                                int v1 = int.Parse(line.Tag.ToString().Split()[0]);
+                                int v2 = int.Parse(line.Tag.ToString().Split()[1]);
+                                if (minEdgeInRelatedComponent.V1.Number == v1 && minEdgeInRelatedComponent.V2.Number == v2 ||
+                                    minEdgeInRelatedComponent.V2.Number == v1 && minEdgeInRelatedComponent.V1.Number == v2)
+                                {
+                                    linesToDraw.Add(line);
+                                }
+                            }
+                            else if (elem is TextBlock text)
+                            {
+                                int v1 = int.Parse(text.Tag.ToString().Split()[0]);
+                                int v2 = int.Parse(text.Tag.ToString().Split()[1]);
+                                if (minEdgeInRelatedComponent.V1.Number == v1 && minEdgeInRelatedComponent.V2.Number == v2 ||
+                                    minEdgeInRelatedComponent.V2.Number == v1 && minEdgeInRelatedComponent.V1.Number == v2)
+                                {
+                                    linesToDraw.Add(text);
+                                }
+                            }
+
+                        }
                         T.E.Add(minEdgeInRelatedComponent);
                     }
+
+
                 }
+
+                await Task.Delay(2000);
+                foreach(var line in linesToDraw)
+                {
+                  
+                    line.Visibility = Visibility.Visible;
+                }
+
             }
-            return T.GetdisorientedGraph();
+            return T;
         }
         public IEnumerable<EdgeView> FindEdgesInRalatedComponents(IEnumerable<VertexView> component)
         {
@@ -212,11 +293,11 @@ namespace GraphVisual
             return toReturn;
         }
 
-        private Edge FindMinEdgeInRelatedComponent(IEnumerable<Vertex> component, IEnumerable<Edge> edgesInComponent)
+        private EdgeView FindMinEdgeInRelatedComponent(IEnumerable<VertexView> component, IEnumerable<EdgeView> edgesInComponent)
         {
             int min = E.Select(x => x.Distance).Max();
-            SortedSet<Edge> minEdgesInVertexs = new SortedSet<Edge>();
-            List<Edge> minEdges = new List<Edge>();
+            SortedSet<EdgeView> minEdgesInVertexs = new SortedSet<EdgeView>();
+            List<EdgeView> minEdges = new List<EdgeView>();
             foreach (var vertex in component)
             {
                 foreach (var edge in FindAdjacentEdges(vertex))
@@ -230,19 +311,19 @@ namespace GraphVisual
             }
             return minEdges.OrderBy(edge => edge.Distance).FirstOrDefault();
         }
-        public IEnumerable<IEnumerable<Vertex>> FindRelatedComponents()
+        public IEnumerable<IEnumerable<VertexView>> FindRelatedComponents()
         {
-            List<Vertex> relations = new List<Vertex>();
-            V.ToList().ForEach(item => relations.Add(new Vertex(item.Number, item.Name)));
+            List<VertexView> relations = new List<VertexView>();
+            V.ToList().ForEach(item => relations.Add(new VertexView() {Name=item.Name, Number = item.Number, X = item.X, Y = item.Y }));
             while (relations.Count != 0)
             {
-                List<Vertex> comp = new List<Vertex>();
-                foreach (var v in DFS(relations.First().Name))
+                List<VertexView> comp = new List<VertexView>();
+                foreach (var v in DFS(relations.First()))
                 {
                     comp.Add(v);
                 }
                 #region Mda
-                List<Vertex> _toRemove = new List<Vertex>();
+                List<VertexView> _toRemove = new List<VertexView>();
                 foreach (var vert in relations)
                 {
                     foreach (var v in comp)
@@ -261,5 +342,16 @@ namespace GraphVisual
                 yield return comp;
             }
         }
+        private IEnumerable<EdgeView> FindAdjacentEdges(VertexView vertex)
+        {
+            foreach (var e in E)
+            {
+                if (e.V1.Number == vertex.Number)
+                {
+                    yield return e;
+                }
+            }
+        }
+
     }
 }

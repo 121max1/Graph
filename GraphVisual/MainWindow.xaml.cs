@@ -552,7 +552,7 @@ namespace GraphVisual
 
             if (chooseAlgComboBox.SelectedIndex == 0)
             {
-                if (_selectedVertexs != null)
+                if (_selectedVertex != null)
                 {
                     foreach (var vertex in await _graph.DFS((int)_selectedVertex.Tag, GraphCanvas))
                     {
@@ -562,7 +562,7 @@ namespace GraphVisual
             }
             else if (chooseAlgComboBox.SelectedIndex == 1)
             {
-               
+               await _graph.AlgBoruvka(GraphCanvas);
             }
         }
     
@@ -571,16 +571,16 @@ namespace GraphVisual
         {
             foreach (UIElement element in GraphCanvas.Children)
             {
+                if (element.Visibility == Visibility.Hidden)
+                {
+                    element.Visibility = Visibility.Visible;
+                    element.IsEnabled = true;
+                }
                 if(element is Line line)
                 {
-                    if (line.Tag == _selectedVertex.Tag)
-                    {
-                        line.Stroke = new SolidColorBrush(Color.FromRgb(0, 140, 0));
-                    }
-                    else
-                    {
-                        line.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-                    }
+
+                    line.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
+                    
                 }
                 if(element is Ellipse ellipse)
                 {
