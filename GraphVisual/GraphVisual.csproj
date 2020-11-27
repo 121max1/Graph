@@ -66,6 +66,9 @@
     <Compile Include="AddNewEdgeWindow.xaml.cs">
       <DependentUpon>AddNewEdgeWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AlgDjekstra\AlgDjekstr.cs" />
+    <Compile Include="AlgDjekstra\EdgeDjekstra.cs" />
+    <Compile Include="AlgDjekstra\VertexDjekstra.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>

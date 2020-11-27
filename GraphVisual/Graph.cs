@@ -226,7 +226,7 @@ namespace GraphVisual
             {
                 VertexView cur = queue.Dequeue();
                 toReturn.Add(cur);
-                await Task.Delay(2000);
+                await Task.Delay(1000);
                 foreach (var elem in graphCanvas.Children)
                 {
                     if (elem is Ellipse ellipse)
@@ -235,17 +235,13 @@ namespace GraphVisual
                         {
                             ellipse.Stroke = new SolidColorBrush(Color.FromRgb(140, 140, 0));
                         }
-                        else if (elem is Line line)
-                        {
-                         
-                        }
                     }
                 }
                 foreach (var vert in FindАdjacentVertexs(cur.Number).OrderBy(x => x.Number))
                 {
                     if (!VisitedVertex.Contains(vert))
                     {
-                        foreach (var elem in graphCanvas.Children)
+                        foreach(var elem in graphCanvas.Children)
                         {
                             if (elem is Ellipse ellipse)
                             {
@@ -253,12 +249,18 @@ namespace GraphVisual
                                 {
                                     ellipse.Stroke = new SolidColorBrush(Color.FromRgb(140, 140, 0));
                                 }
-                                else if (elem is Line line)
+                            }
+                            else if (elem is Line line)
+                            {
+                                int v1 = int.Parse(line.Tag.ToString().Split()[0]);
+                                int v2 = int.Parse(line.Tag.ToString().Split()[1]);
+                                if(cur.Number == v1 && vert.Number == v2)
                                 {
-
+                                    line.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 140));
                                 }
                             }
                         }
+                        await Task.Delay(1000);
                         queue.Enqueue(vert);
                         VisitedVertex.Add(vert);
                     }

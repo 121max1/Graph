@@ -17,6 +17,8 @@ namespace GraphVisual.Models
 
         public static int Radius = 12;
 
+        public bool IsVisited { get; set; }
+
         public int CompareTo(object obj)
         {
             VertexView v = obj as VertexView;

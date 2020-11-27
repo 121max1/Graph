@@ -39,6 +39,11 @@
                     <TextBlock>Алгоритм Борувки</TextBlock>
                 </StackPanel>
             </ComboBoxItem>
+            <ComboBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock>Алгоритм Дейкстры</TextBlock>
+                </StackPanel>
+            </ComboBoxItem>
         </ComboBox>
         <Label Content="Выберите режим:" HorizontalAlignment="Left" Margin="1029,22,0,0" VerticalAlignment="Top" FontSize="14" Width="126"/>
         <RadioButton Content="Обучающий" HorizontalAlignment="Left" Margin="1029,51,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked" FontSize="14" Width="101"/>

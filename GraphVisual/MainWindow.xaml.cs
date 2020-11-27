@@ -1,4 +1,5 @@
-﻿using GraphVisual.Models;
+﻿using Graph.AlgDjekstra;
+using GraphVisual.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -547,6 +548,23 @@ namespace GraphVisual
             }
         }
 
+        private void AddTextBlocksForDjekstra()
+        {
+            List<TextBlock> toAdd = new List<TextBlock>();
+            foreach(VertexView vertex in _graph.V)
+            {
+                TextBlock text = new TextBlock();
+                text.Tag = vertex.Number + " Dj";
+                text.Text = "INF";
+                text.FontSize = 18;
+                text.Foreground = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                Canvas.SetLeft(text, vertex.X - 20);
+                Canvas.SetTop(text, vertex.Y - 35);
+                GraphCanvas.Children.Add(text);
+            }
+            
+        }
+
         private async void StartAlgorithmButton_Click(object sender, RoutedEventArgs e)
         {
 
@@ -574,8 +592,16 @@ namespace GraphVisual
             {
                 await _graph.AlgBoruvka(GraphCanvas);
             }
-            
-            
+            else if (chooseAlgComboBox.SelectedIndex == 3)
+            {
+                if (_selectedVertex != null)
+                {
+                    AddTextBlocksForDjekstra();
+                    await AlgDjekstr.AlgDjekstra((int)_selectedVertex.Tag, _graph, GraphCanvas);
+                }
+            }
+
+
         }
     
 
