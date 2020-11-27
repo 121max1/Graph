@@ -562,8 +562,20 @@ namespace GraphVisual
             }
             else if (chooseAlgComboBox.SelectedIndex == 1)
             {
-               await _graph.AlgBoruvka(GraphCanvas);
+                if (_selectedVertex != null)
+                {
+                    foreach (var vertex in await _graph.BFS((int)_selectedVertex.Tag, GraphCanvas))
+                    {
+                        textBoxAnswer.Text += vertex.Name + "->";
+                    }
+                }
             }
+            else if (chooseAlgComboBox.SelectedIndex == 2)
+            {
+                await _graph.AlgBoruvka(GraphCanvas);
+            }
+            
+            
         }
     
 
@@ -588,6 +600,7 @@ namespace GraphVisual
                 }
             }
             textBoxAnswer.Text = "";
+            _selectedVertex = null;
         }
     }
 }

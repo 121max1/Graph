@@ -31,12 +31,12 @@
             </ComboBoxItem>
             <ComboBoxItem IsSelected="True">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock>Алгоритм Борувки</TextBlock>
+                    <TextBlock>Обход в ширину</TextBlock>
                 </StackPanel>
             </ComboBoxItem>
-            <ComboBoxItem IsSelected="True">
+            <ComboBoxItem>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock>Алгоритм Дейстры</TextBlock>
+                    <TextBlock>Алгоритм Борувки</TextBlock>
                 </StackPanel>
             </ComboBoxItem>
         </ComboBox>

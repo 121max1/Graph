@@ -37,7 +37,6 @@ namespace GraphVisual
             {
                 E.Remove(edge);
             }
-            // баг
             foreach (var edge in E)
             {
                 if (edge.V1.Number > vertex.Number)
@@ -204,6 +203,69 @@ namespace GraphVisual
             }
             return toReturn;
         }
+        public async Task<IEnumerable<VertexView>> BFS(int v_num, Canvas graphCanvas)
+        {
+            Queue<VertexView> queue = new Queue<VertexView>();
+            List<VertexView> toReturn = new List<VertexView>();
+            VertexView visited = V.Where(x => x.Number == v_num).First();
+            foreach (var elem in graphCanvas.Children)
+            {
+                if (elem is Ellipse ellipse)
+                {
+                    if ((int)ellipse.Tag == visited.Number)
+                    {
+                        ellipse.Stroke = new SolidColorBrush(Color.FromRgb(140, 140, 0));
+                    }
+                }
+            }
+            queue.Enqueue(visited);
+            toReturn.Add(visited);
+            SortedSet<VertexView> VisitedVertex = new SortedSet<VertexView>();
+            VisitedVertex.Add(visited);
+            while(queue.Count != 0)
+            {
+                VertexView cur = queue.Dequeue();
+                toReturn.Add(cur);
+                await Task.Delay(2000);
+                foreach (var elem in graphCanvas.Children)
+                {
+                    if (elem is Ellipse ellipse)
+                    {
+                        if ((int)ellipse.Tag == cur.Number)
+                        {
+                            ellipse.Stroke = new SolidColorBrush(Color.FromRgb(140, 140, 0));
+                        }
+                        else if (elem is Line line)
+                        {
+                         
+                        }
+                    }
+                }
+                foreach (var vert in FindАdjacentVertexs(cur.Number).OrderBy(x => x.Number))
+                {
+                    if (!VisitedVertex.Contains(vert))
+                    {
+                        foreach (var elem in graphCanvas.Children)
+                        {
+                            if (elem is Ellipse ellipse)
+                            {
+                                if ((int)ellipse.Tag == cur.Number)
+                                {
+                                    ellipse.Stroke = new SolidColorBrush(Color.FromRgb(140, 140, 0));
+                                }
+                                else if (elem is Line line)
+                                {
+
+                                }
+                            }
+                        }
+                        queue.Enqueue(vert);
+                        VisitedVertex.Add(vert);
+                    }
+                }
+            }
+            return toReturn;
+        }
         public async Task<Graph> AlgBoruvka(Canvas graphCanvas)
         {
             Graph T = new Graph();
@@ -212,18 +274,18 @@ namespace GraphVisual
             {
                 if (elem is Line line)
                 {
-                    
-                    elem.Visibility = Visibility.Hidden;
+
+                    line.Visibility = Visibility.Hidden;
                 }
-                if(elem is TextBlock text)
+                else if (elem is TextBlock text)
                 {
-                    if (text.Text.ToString().Split().Length == 2)
+                    if (text.Tag.ToString().Split().Length == 2)
                     {
-                       
-                        elem.Visibility = Visibility.Hidden;
+
+                        text.Visibility = Visibility.Hidden;
                     }
                 }
-                
+
             }
             while (T.FindRelatedComponents().Count() != 1)
             {
@@ -247,12 +309,15 @@ namespace GraphVisual
                             }
                             else if (elem is TextBlock text)
                             {
-                                int v1 = int.Parse(text.Tag.ToString().Split()[0]);
-                                int v2 = int.Parse(text.Tag.ToString().Split()[1]);
-                                if (minEdgeInRelatedComponent.V1.Number == v1 && minEdgeInRelatedComponent.V2.Number == v2 ||
-                                    minEdgeInRelatedComponent.V2.Number == v1 && minEdgeInRelatedComponent.V1.Number == v2)
+                                if (text.Tag.ToString().Split().Length == 2)
                                 {
-                                    linesToDraw.Add(text);
+                                    int v1 = int.Parse(text.Tag.ToString().Split()[0]);
+                                    int v2 = int.Parse(text.Tag.ToString().Split()[1]);
+                                    if (minEdgeInRelatedComponent.V1.Number == v1 && minEdgeInRelatedComponent.V2.Number == v2 ||
+                                        minEdgeInRelatedComponent.V2.Number == v1 && minEdgeInRelatedComponent.V1.Number == v2)
+                                    {
+                                        linesToDraw.Add(text);
+                                    }
                                 }
                             }
 
