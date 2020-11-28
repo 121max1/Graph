@@ -92,7 +92,10 @@ namespace Graph.AlgDjekstra
             {
                 if (e.V1.Number == vertex.Number)
                 {
-                    adjacentVertexs.Add(e.V2);
+                    if (e.V2.IsVisited == false)
+                    {
+                        adjacentVertexs.Add(e.V2);
+                    }
                 }
             }
             return adjacentVertexs;
@@ -140,7 +143,7 @@ namespace Graph.AlgDjekstra
             }
             int min_dist = Vertices.Where(item => item.IsVisited!=true).Select(item => item.CurrentMark).Min();
             VertexDjekstra min_vert = Vertices.Where(item => item.IsVisited != true && item.CurrentMark == min_dist).First();
-            min_vert.IsVisited = true;
+            Vertices.Where(item => item.IsVisited != true && item.CurrentMark == min_dist).First().IsVisited = true;
             _distances.Add(min_vert, min_dist);
             foreach (var element in grCanvas.Children)
             {

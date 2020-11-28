@@ -543,7 +543,7 @@ namespace GraphVisual
                 AddVertexButton.IsEnabled = true;
                 AddEdgeButton.IsEnabled = true;
                 DeleteButton.IsEnabled = true;
-                _selectedVertex.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                //_selectedVertex.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
                 _selectedVertex = null;
             }
         }
@@ -597,7 +597,10 @@ namespace GraphVisual
                 if (_selectedVertex != null)
                 {
                     AddTextBlocksForDjekstra();
-                    await AlgDjekstr.AlgDjekstra((int)_selectedVertex.Tag, _graph, GraphCanvas);
+                    foreach(var pair in await AlgDjekstr.AlgDjekstra((int)_selectedVertex.Tag, _graph, GraphCanvas))
+                    {
+                        textBoxAnswer.Text += pair.Key.Name + "-" + pair.Value.ToString() + "\n";
+                    }
                 }
             }
 

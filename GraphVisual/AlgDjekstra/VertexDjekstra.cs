@@ -33,6 +33,7 @@ namespace Graph.AlgDjekstra
 
         public VertexDjekstra()
         {
+            CurrentMark = int.MaxValue / 2;
         }
     }
 }
