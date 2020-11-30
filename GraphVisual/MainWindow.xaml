@@ -23,7 +23,7 @@
             <Image Source = "Resources/SelectVertexImage.jpg" Width="69" Height="52"/>
         </Button>
         <Label Content="Выберите алгоритм:" HorizontalAlignment="Left" Margin="1029,88,0,0" VerticalAlignment="Top" Width="145" RenderTransformOrigin="0.059,-1.331" FontSize="14"/>
-        <ComboBox Name="chooseAlgComboBox" HorizontalAlignment="Left" Margin="1029,122,0,0" VerticalAlignment="Top" Width="168" IsSynchronizedWithCurrentItem="False" FontSize="14">
+        <ComboBox Name="chooseAlgComboBox" HorizontalAlignment="Left" Margin="1029,122,0,0" VerticalAlignment="Top" Width="168" IsSynchronizedWithCurrentItem="False" FontSize="14" SelectionChanged="chooseAlgComboBox_SelectionChanged">
             <ComboBoxItem IsSelected="True">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock>Обход в глубину</TextBlock>

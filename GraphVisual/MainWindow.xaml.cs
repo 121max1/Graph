@@ -1,6 +1,5 @@
 ﻿using Graph.AlgDjekstra;
 using GraphVisual.Models;
-using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +33,17 @@ namespace GraphVisual
         private List<Ellipse> _selectedVertexs = new List<Ellipse>();
         private List<Line> _linesOnCanvas = new List<Line>();
         private readonly Graph _graph = new Graph();
+        private List<Ellipse> _selectedVertexsToColorEdge = new List<Ellipse>();
+        private int _algmode = 1;
+
+        enum AlgMode
+        {
+            DFS,
+            BFS,
+            Djekstra,
+            Boruvka
+        }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -197,8 +207,35 @@ namespace GraphVisual
                 {
                     if (vert != null)
                     {
-                        _selectedVertexsForAlg.Add(vert);
-                        vert.Stroke = new SolidColorBrush(Color.FromRgb(0, 140, 0));
+                        if (!_selectedVertexsForAlg.Contains(vert))
+                        {
+                            _selectedVertexsForAlg.Add(vert);
+                            if(_selectedVertexsToColorEdge.Count<2)
+                            {
+                                _selectedVertexsToColorEdge.Add(vert);
+                            }
+                            if (_algmode == 0)
+                            {
+                                if (_selectedVertexsToColorEdge.Count == 2)
+                                {
+                                    foreach (var element in GraphCanvas.Children)
+                                    {
+                                        if (element is Line line)
+                                        {
+                                            int firstVertexNumber = int.Parse(line.Tag.ToString().Split()[0]);
+                                            int secondVertexNumber = int.Parse(line.Tag.ToString().Split()[1]);
+                                            if (firstVertexNumber == (int)_selectedVertexsToColorEdge[0].Tag
+                                                && secondVertexNumber == (int)_selectedVertexsToColorEdge[1].Tag)
+                                            {
+                                                line.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 140));
+                                            }
+                                        }
+                                    }
+                                    _selectedVertexsToColorEdge.RemoveAt(0);
+                                }
+                            }
+                            vert.Stroke = new SolidColorBrush(Color.FromRgb(0, 140, 0));
+                        }
                     }
                 }
             }
@@ -605,25 +642,25 @@ namespace GraphVisual
                     }
                     else
                     {
-                        string answer_comp=" ";
+                        string answer_comp = " ";
                         foreach (var vertex in _graph.DFSLearningMode((int)_selectedVertex.Tag))
                         {
                             answer_comp += vertex.Name + " ";
                         }
                         string answer_user = " ";
-                        foreach(var elp in _selectedVertexsForAlg)
+                        foreach (var elp in _selectedVertexsForAlg)
                         {
-                            answer_user += elp.Tag.ToString()+ " ";
+                            answer_user += elp.Tag.ToString() + " ";
                         }
                         if (answer_comp == answer_user)
                         {
 
-                                MessageBox.Show(
-                                "Задание решено верно",
-                                "Сообщение",
-                                 MessageBoxButton.OK
+                            MessageBox.Show(
+                            "Задание решено верно",
+                            "Сообщение",
+                             MessageBoxButton.OK
 
-                                );
+                            );
 
                         }
                         else
@@ -633,17 +670,90 @@ namespace GraphVisual
                                 "Сообщение",
                                  MessageBoxButton.OK
                                  );
-                        }    
+                        }
+                        foreach (UIElement element in GraphCanvas.Children)
+                        {
+                            if (element is Line line)
+                            {
+
+                                line.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
+
+                            }
+                            if (element is Ellipse ellipse)
+                            {
+                                ellipse.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                            }
+                        }
+                        _selectedVertex = null;
+                        _selectedVertexsForAlg.Clear();
+                        _selectedVertexsToColorEdge.Clear();
                     }
                 }
             }
             else if (chooseAlgComboBox.SelectedIndex == 1)
             {
+                if (_learningMode == true)
+                {
+                    _selectedVertex = _selectedVertexsForAlg.FirstOrDefault();
+                }
+
                 if (_selectedVertex != null)
                 {
-                    foreach (var vertex in await _graph.BFS((int)_selectedVertex.Tag, GraphCanvas))
+                    if (_learningMode == false)
                     {
-                        textBoxAnswer.Text += vertex.Name + "->";
+                        foreach (var vertex in await _graph.BFS((int)_selectedVertex.Tag, GraphCanvas))
+                        {
+                            textBoxAnswer.Text += vertex.Name + "->";
+                        }
+                    }
+                    else
+                    {
+                        string answer_comp = " ";
+                        foreach (var vertex in _graph.BFSLearningMode((int)_selectedVertex.Tag))
+                        {
+                            answer_comp += vertex.Name + " ";
+                        }
+                        string answer_user = " ";
+                        foreach (var elp in _selectedVertexsForAlg)
+                        {
+                            answer_user += elp.Tag.ToString() + " ";
+                        }
+                        if (answer_comp == answer_user)
+                        {
+
+                            MessageBox.Show(
+                            "Задание решено верно",
+                            "Сообщение",
+                             MessageBoxButton.OK
+
+                            );
+
+                        }
+                        else
+                        {
+                            MessageBox.Show(
+                                "Задание решено неверно",
+                                "Сообщение",
+                                 MessageBoxButton.OK
+                                 );
+                        }
+                        foreach (UIElement element in GraphCanvas.Children)
+                        {
+                            if (element is Line line)
+                            {
+
+                                line.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
+
+                            }
+                            if (element is Ellipse ellipse)
+                            {
+                                ellipse.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                            }
+                        }
+                        _selectedVertex = null;
+                        _selectedVertexsForAlg.Clear();
+                        _selectedVertexsToColorEdge.Clear();
+
                     }
                 }
             }
@@ -669,6 +779,7 @@ namespace GraphVisual
 
         private void Reset_Click(object sender, RoutedEventArgs e)
         {
+            List<UIElement> toRemove = new List<UIElement>();
             foreach (UIElement element in GraphCanvas.Children)
             {
                 if (element.Visibility == Visibility.Hidden)
@@ -686,14 +797,40 @@ namespace GraphVisual
                 {
                     ellipse.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
                 }
+                if(element is TextBlock textBlock)
+                {
+                    if(textBlock.Tag.ToString().Split().Length == 2)
+                    {
+                        if (textBlock.Tag.ToString().Split()[1] == "Dj")
+                        {
+                            toRemove.Add(textBlock);
+                        }
+                    }
+                }
+            }
+            foreach(var element in toRemove)
+            {
+                GraphCanvas.Children.Remove(element);
             }
             textBoxAnswer.Text = "";
             _selectedVertex = null;
+            _selectedVertexsForAlg.Clear();
+            _selectedVertexsToColorEdge.Clear();
         }
 
         private void RadioButton_Checked_1(object sender, RoutedEventArgs e)
         {
             _learningMode = true;
+        }
+
+        private void chooseAlgComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox comboBox = sender as ComboBox;
+            if(comboBox!=null)
+            {
+                _algmode = comboBox.SelectedIndex;
+            } 
+            
         }
     }
 }

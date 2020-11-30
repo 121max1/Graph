@@ -133,7 +133,7 @@ namespace GraphVisual
                     toReturn.Add(s);
                 }
                 VisitedVertex.Add(s);
-                foreach (var vert in FindАdjacentVertexs(num_v).OrderByDescending(x => x.Number))
+                foreach (var vert in FindАdjacentVertexs(s.Number).OrderByDescending(x => x.Number))
                 {
                     if (!VisitedVertex.Contains(vert))
                     {
@@ -226,6 +226,29 @@ namespace GraphVisual
                     if (!VisitedVertex.Contains(vert))
                     {
                         stack.Push(vert);
+                    }
+                }
+            }
+            return toReturn;
+        }
+        public IEnumerable<VertexView> BFSLearningMode(int v_num)
+        {
+            Queue<VertexView> queue = new Queue<VertexView>();
+            List<VertexView> toReturn = new List<VertexView>();
+            VertexView visited = V.Where(x => x.Number == v_num).First();
+            queue.Enqueue(visited);
+            SortedSet<VertexView> VisitedVertex = new SortedSet<VertexView>();
+            VisitedVertex.Add(visited);
+            while (queue.Count != 0)
+            {
+                VertexView cur = queue.Dequeue();
+                toReturn.Add(cur);
+                foreach (var vert in FindАdjacentVertexs(cur.Number).OrderBy(x => x.Number))
+                {
+                    if (!VisitedVertex.Contains(vert))
+                    {
+                        queue.Enqueue(vert);
+                        VisitedVertex.Add(vert);
                     }
                 }
             }
