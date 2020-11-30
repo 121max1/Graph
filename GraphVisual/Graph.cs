@@ -116,6 +116,34 @@ namespace GraphVisual
             return adjacentVertexs;
         }
 
+        public IEnumerable<VertexView> DFSLearningMode(int num_v)
+        {
+            Stack<VertexView> stack = new Stack<VertexView>();
+            List<VertexView> toReturn = new List<VertexView>();
+            VertexView visited = V.Where(x => x.Number == num_v).First();
+            stack.Push(visited);
+            toReturn.Add(visited);
+            SortedSet<VertexView> VisitedVertex = new SortedSet<VertexView>();
+            VisitedVertex.Add(visited);
+            while (stack.Count != 0)
+            {
+                VertexView s = stack.Pop();
+                if (!VisitedVertex.Contains(s))
+                {
+                    toReturn.Add(s);
+                }
+                VisitedVertex.Add(s);
+                foreach (var vert in FindАdjacentVertexs(num_v).OrderByDescending(x => x.Number))
+                {
+                    if (!VisitedVertex.Contains(vert))
+                    {
+                        stack.Push(vert);
+
+                    }
+                }
+            }
+            return toReturn;
+        }
         public IEnumerable<VertexView> DFS(VertexView v)
         {
             Stack<VertexView> stack = new Stack<VertexView>();

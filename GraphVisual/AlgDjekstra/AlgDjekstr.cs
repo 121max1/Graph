@@ -52,8 +52,9 @@ namespace Graph.AlgDjekstra
                 Vertices.Add(new VertexDjekstra(vertex));
             }
             VertexDjekstra firstVertex = Vertices.Where(item => item.Number == startVertex.Number).First();
-            firstVertex.IsVisited = true;
+            //firstVertex.IsVisited = true;
             firstVertex.CurrentMark = 0;
+            /*
             _distances.Add(startVertex, 0);
             foreach(var element in grCanvas.Children)
             {
@@ -73,6 +74,7 @@ namespace Graph.AlgDjekstra
                     }
                 }
             }    
+            */
             await FindMinWays(firstVertex);
             return _distances;
         }
@@ -110,8 +112,9 @@ namespace Graph.AlgDjekstra
         {
             foreach(var v in FindАdjacentVertexs(vertex))
             {
-                int CurrentMark = Math.Min(v.CurrentMark, vertex.CurrentMark + FindEdge(vertex, v).Distance);
-                Vertices.Where(x => x.Number == v.Number).FirstOrDefault().CurrentMark = CurrentMark;
+                var vert = Vertices.Where(x=>x.Number==v.Number).FirstOrDefault();
+                int CurrentMark = Math.Min(vert.CurrentMark, vertex.CurrentMark + FindEdge(vertex, vert).Distance);
+                Vertices.Where(x => x.Number == vert.Number).FirstOrDefault().CurrentMark = CurrentMark;
                 await Task.Delay(1000);
                 foreach (var element in grCanvas.Children)
                 {
@@ -138,9 +141,8 @@ namespace Graph.AlgDjekstra
                             }
                         }
                     }
-                }
-
-            }
+                }     
+           }
             int min_dist = Vertices.Where(item => item.IsVisited!=true).Select(item => item.CurrentMark).Min();
             VertexDjekstra min_vert = Vertices.Where(item => item.IsVisited != true && item.CurrentMark == min_dist).First();
             Vertices.Where(item => item.IsVisited != true && item.CurrentMark == min_dist).First().IsVisited = true;

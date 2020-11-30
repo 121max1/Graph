@@ -25,13 +25,11 @@ namespace Graph.AlgDjekstra
         {
             V1 = new VertexDjekstra()
             {
-                IsVisited = v1.IsVisited,
                 Number = v1.Number,
-                Name = v1.Name
+                Name = v1.Name   
             };
             V2 = new VertexDjekstra()
             {
-                IsVisited = v2.IsVisited,
                 Number = v2.Number,
                 Name = v2.Name
             };

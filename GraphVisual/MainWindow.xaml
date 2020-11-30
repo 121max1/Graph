@@ -46,8 +46,8 @@
             </ComboBoxItem>
         </ComboBox>
         <Label Content="Выберите режим:" HorizontalAlignment="Left" Margin="1029,22,0,0" VerticalAlignment="Top" FontSize="14" Width="126"/>
-        <RadioButton Content="Обучающий" HorizontalAlignment="Left" Margin="1029,51,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked" FontSize="14" Width="101"/>
-        <RadioButton Content="Обычный" HorizontalAlignment="Left" Margin="1029,72,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked" FontSize="14" Width="83"/>
+        <RadioButton Content="Обучающий" HorizontalAlignment="Left" Margin="1029,51,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked_1" FontSize="14" Width="101"/>
+        <RadioButton Content="Обычный" HorizontalAlignment="Left" Margin="1029,72,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked" FontSize="14" Width="83" IsChecked="True"/>
         <Button Name ="StartAlgorithmButton" Content="Запустить" Margin="1029,152,23,0" VerticalAlignment="Top" FontSize="14" Click="StartAlgorithmButton_Click"/>
         <Label Content="Текстовый ответ:" HorizontalAlignment="Left" Margin="1028,198,0,0" VerticalAlignment="Top" Width="124" FontSize="14"/>
         <TextBox Name = "textBoxAnswer" Height="142" Margin="1030,225,24,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.242,-3"/>

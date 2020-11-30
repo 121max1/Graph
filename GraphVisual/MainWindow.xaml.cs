@@ -1,5 +1,6 @@
 ﻿using Graph.AlgDjekstra;
 using GraphVisual.Models;
+using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,9 @@ namespace GraphVisual
         private bool _deleteButtonIsPressed = false;
         private bool _selectVertexButtonIsPressed = false;
         private bool _alreadyDeleted = false;
+        private bool _learningMode = false;
         private Ellipse _selectedVertex;
+        private List<Ellipse> _selectedVertexsForAlg = new List<Ellipse>();
         private List<Ellipse> _selectedVertexs = new List<Ellipse>();
         private List<Line> _linesOnCanvas = new List<Line>();
         private readonly Graph _graph = new Graph();
@@ -39,13 +42,14 @@ namespace GraphVisual
        
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-
+            _learningMode = true;
         }
 
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
-
+            _learningMode = false;
         }
+
 
 
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -171,17 +175,32 @@ namespace GraphVisual
 
         private void ChildSelectVertexButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Ellipse vert = sender as Ellipse;
-            if (_selectVertexButtonIsPressed)
+            if (_learningMode == false)
             {
-                if(_selectedVertex != null)
+                Ellipse vert = sender as Ellipse;
+                if (_selectVertexButtonIsPressed)
                 {
-                    _selectedVertex.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
-                }
-                
-                _selectedVertex = vert;
-                vert.Stroke = new SolidColorBrush(Color.FromRgb(0, 140, 0));
+                    if (_selectedVertex != null)
+                    {
+                        _selectedVertex.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                    }
 
+                    _selectedVertex = vert;
+                    vert.Stroke = new SolidColorBrush(Color.FromRgb(0, 140, 0));
+
+                }
+            }
+            else
+            {
+                Ellipse vert = sender as Ellipse;
+                if (_selectVertexButtonIsPressed)
+                {
+                    if (vert != null)
+                    {
+                        _selectedVertexsForAlg.Add(vert);
+                        vert.Stroke = new SolidColorBrush(Color.FromRgb(0, 140, 0));
+                    }
+                }
             }
         }
 
@@ -570,11 +589,51 @@ namespace GraphVisual
 
             if (chooseAlgComboBox.SelectedIndex == 0)
             {
+                if (_learningMode == true)
+                {
+                    _selectedVertex = _selectedVertexsForAlg.FirstOrDefault();
+                }
+                
                 if (_selectedVertex != null)
                 {
-                    foreach (var vertex in await _graph.DFS((int)_selectedVertex.Tag, GraphCanvas))
+                    if (_learningMode == false)
                     {
-                        textBoxAnswer.Text += vertex.Name + "->";
+                        foreach (var vertex in await _graph.DFS((int)_selectedVertex.Tag, GraphCanvas))
+                        {
+                            textBoxAnswer.Text += vertex.Name + "->";
+                        }
+                    }
+                    else
+                    {
+                        string answer_comp=" ";
+                        foreach (var vertex in _graph.DFSLearningMode((int)_selectedVertex.Tag))
+                        {
+                            answer_comp += vertex.Name + " ";
+                        }
+                        string answer_user = " ";
+                        foreach(var elp in _selectedVertexsForAlg)
+                        {
+                            answer_user += elp.Tag.ToString()+ " ";
+                        }
+                        if (answer_comp == answer_user)
+                        {
+
+                                MessageBox.Show(
+                                "Задание решено верно",
+                                "Сообщение",
+                                 MessageBoxButton.OK
+
+                                );
+
+                        }
+                        else
+                        {
+                            MessageBox.Show(
+                                "Задание решено неверно",
+                                "Сообщение",
+                                 MessageBoxButton.OK
+                                 );
+                        }    
                     }
                 }
             }
@@ -630,6 +689,11 @@ namespace GraphVisual
             }
             textBoxAnswer.Text = "";
             _selectedVertex = null;
+        }
+
+        private void RadioButton_Checked_1(object sender, RoutedEventArgs e)
+        {
+            _learningMode = true;
         }
     }
 }
