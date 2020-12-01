@@ -234,6 +234,21 @@ namespace GraphVisual
                                     _selectedVertexsToColorEdge.RemoveAt(0);
                                 }
                             }
+                            if(_algmode == 1)
+                            {
+                                foreach (var element in GraphCanvas.Children)
+                                {
+                                    if (element is Line line)
+                                    {
+                                        int firstVertexNumber = int.Parse(line.Tag.ToString().Split()[0]);
+                                        int secondVertexNumber = int.Parse(line.Tag.ToString().Split()[1]);
+                                        if (firstVertexNumber == (int)_selectedVertexsToColorEdge[0].Tag)
+                                        {
+                                            line.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 140));
+                                        }
+                                    }
+                                }
+                            }
                             vert.Stroke = new SolidColorBrush(Color.FromRgb(0, 140, 0));
                         }
                     }
