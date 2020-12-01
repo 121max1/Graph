@@ -242,7 +242,7 @@ namespace GraphVisual
                                     {
                                         int firstVertexNumber = int.Parse(line.Tag.ToString().Split()[0]);
                                         int secondVertexNumber = int.Parse(line.Tag.ToString().Split()[1]);
-                                        if (firstVertexNumber == (int)_selectedVertexsToColorEdge[0].Tag)
+                                        if (firstVertexNumber == (int)vert.Tag)
                                         {
                                             line.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 140));
                                         }
