@@ -35,6 +35,7 @@ namespace GraphVisual
         private readonly Graph _graph = new Graph();
         private List<Ellipse> _selectedVertexsToColorEdge = new List<Ellipse>();
         private int _algmode = 1;
+        private int _buttonStartClickCount = 0;
 
         enum AlgMode
         {
@@ -119,7 +120,10 @@ namespace GraphVisual
 
                         try
                         {
-                            _graph.AddEdge(edge);
+                            if (_algmode != 2 || _algmode != 3)
+                            {
+                                _graph.AddEdge(edge);
+                            }
                         }
                         catch(Exception excp)
                         {
@@ -241,7 +245,6 @@ namespace GraphVisual
                                     if (element is Line line)
                                     {
                                         int firstVertexNumber = int.Parse(line.Tag.ToString().Split()[0]);
-                                        int secondVertexNumber = int.Parse(line.Tag.ToString().Split()[1]);
                                         if (firstVertexNumber == (int)vert.Tag)
                                         {
                                             line.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 140));
@@ -258,9 +261,9 @@ namespace GraphVisual
 
         private void AddEdgeLine_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            Ellipse ellipse = sender as Ellipse;
             if (_addEdgeButtonIsPressed)
             {
-                Ellipse ellipse = sender as Ellipse;
                 bool addToSelectedVertexFlag = true;
                 foreach (var elps in _selectedVertexs)
                 {
@@ -285,6 +288,7 @@ namespace GraphVisual
                         _selectedVertexs.Clear();
                     }
                 }
+
             }
         }
         private void ChildDeleteEdge_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -638,14 +642,17 @@ namespace GraphVisual
 
         private async void StartAlgorithmButton_Click(object sender, RoutedEventArgs e)
         {
-
+            if(_learningMode == true && (_algmode == 2 || _algmode == 3))
+            {
+                _buttonStartClickCount+=1;
+            }
             if (chooseAlgComboBox.SelectedIndex == 0)
             {
                 if (_learningMode == true)
                 {
                     _selectedVertex = _selectedVertexsForAlg.FirstOrDefault();
                 }
-                
+
                 if (_selectedVertex != null)
                 {
                     if (_learningMode == false)
@@ -774,14 +781,106 @@ namespace GraphVisual
             }
             else if (chooseAlgComboBox.SelectedIndex == 2)
             {
-                await _graph.AlgBoruvka(GraphCanvas);
+                if (_learningMode == true)
+                {
+                    List<UIElement> graphVisualChildren = new List<UIElement>();
+                    if (_buttonStartClickCount == 1)
+                    {
+                        List<UIElement> toRemove = new List<UIElement>();
+                        foreach (UIElement element in GraphCanvas.Children)
+                        {
+                            graphVisualChildren.Add(element);
+                            if (element is Line line)
+                            {
+                                toRemove.Add(line);
+                            }
+                        }
+                        foreach (var line in toRemove)
+                        {
+                            GraphCanvas.Children.Remove(line);
+                        }
+                    }
+                    else
+                    {
+                        bool rightAnswer = true;
+                        var answerEdges = _graph.AlgBoruvkaLearning().E;
+                        List<EdgeView> userAnswer = new List<EdgeView>();
+                        foreach (var element in GraphCanvas.Children)
+                        {
+                            if (element is Line line)
+                            {
+                                int firstVertexNumber = int.Parse(line.Tag.ToString().Split()[0]);
+                                int secondVertexNumber = int.Parse(line.Tag.ToString().Split()[1]);
+                                userAnswer.Add(new EdgeView()
+                                {
+                                    V1 = new VertexView() { Number = firstVertexNumber },
+                                    V2 = new VertexView() { Number = secondVertexNumber }
+                                });
+
+                            }
+                        }
+                        if (userAnswer.Count == answerEdges.Count)
+                        {
+                            foreach (var edge in userAnswer)
+                            {
+                                if (!answerEdges.Contains(edge))
+                                {
+                                    rightAnswer = false;
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            rightAnswer = false;
+                        }
+
+                        if (rightAnswer == true)
+                        {
+
+                            MessageBox.Show(
+                            "Задание решено верно",
+                            "Сообщение",
+                             MessageBoxButton.OK
+
+                            );
+                        }
+                        else
+                        {
+                            MessageBox.Show(
+                                   "Задание решено неверно",
+                                   "Сообщение",
+                                    MessageBoxButton.OK
+                                    );
+                        }
+                        _buttonStartClickCount = 0;
+                        List<UIElement> toDelete = new List<UIElement>();
+                        foreach (UIElement element in GraphCanvas.Children)
+                        {
+                            toDelete.Add(element);
+                        }
+                        foreach (var element in toDelete)
+                        {
+                            GraphCanvas.Children.Remove(element);
+                        }
+                        foreach (var line in graphVisualChildren)
+                        {
+                            GraphCanvas.Children.Add(line);
+                        }
+
+                    }
+                }
+                else
+                {
+                    await _graph.AlgBoruvka(GraphCanvas);
+                }
             }
             else if (chooseAlgComboBox.SelectedIndex == 3)
             {
                 if (_selectedVertex != null)
                 {
                     AddTextBlocksForDjekstra();
-                    foreach(var pair in await AlgDjekstr.AlgDjekstra((int)_selectedVertex.Tag, _graph, GraphCanvas))
+                    foreach (var pair in await AlgDjekstr.AlgDjekstra((int)_selectedVertex.Tag, _graph, GraphCanvas))
                     {
                         textBoxAnswer.Text += pair.Key.Name + "-" + pair.Value.ToString() + "\n";
                     }

@@ -29,7 +29,9 @@ namespace GraphVisual.Models
             else
                 throw new Exception("Невозможно сравнить два объекта");
         }
-        
+
+       
+
     }
 
     

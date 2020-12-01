@@ -319,6 +319,23 @@ namespace GraphVisual
             }
             return toReturn;
         }
+        public Graph AlgBoruvkaLearning()
+        {
+            Graph T = new Graph();
+            T.V = V;
+            while (T.FindRelatedComponents().Count() != 1)
+            {
+                foreach (var relatedComponent in T.FindRelatedComponents())
+                {
+                    EdgeView minEdgeInRelatedComponent = FindMinEdgeInRelatedComponent(relatedComponent, FindEdgesInRalatedComponents(relatedComponent));
+                    if (minEdgeInRelatedComponent != null)
+                    {
+                        T.E.Add(minEdgeInRelatedComponent);
+                    }
+                }
+            }
+            return T;
+        }
         public async Task<Graph> AlgBoruvka(Canvas graphCanvas)
         {
             Graph T = new Graph();
@@ -377,8 +394,6 @@ namespace GraphVisual
                         }
                         T.E.Add(minEdgeInRelatedComponent);
                     }
-
-
                 }
 
                 await Task.Delay(2000);

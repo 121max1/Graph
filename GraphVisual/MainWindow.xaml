@@ -14,7 +14,7 @@
             <Image Source = "Resources/AddVertexImage.png" Width="69" Height="52"/>
         </Button>
         <Button Name ="AddEdgeButton"  HorizontalAlignment="Left" Margin="7,82,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52" Click="AddEdgeButton_Click">
-            <Image Source = "Resources/AddEdgeImage.png" Width="69" Height="52"/>
+            <Image Source = "Resources/AddEdgeImage.png" Width="69" Height="52" RenderTransformOrigin="0.58,0.5"/>
         </Button>
         <Button Name="DeleteButton" HorizontalAlignment="Left" Margin="7,142,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="-0.059,-7.115" Height="52" Click="DeleteButton_Click">
             <Image Source = "Resources/DeleteButtonImage.jpg" Width="69" Height="52"/>
