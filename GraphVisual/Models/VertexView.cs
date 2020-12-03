@@ -29,9 +29,29 @@ namespace GraphVisual.Models
             else
                 throw new Exception("Невозможно сравнить два объекта");
         }
+        public VertexView()
+        {
 
-       
-
+        }
+        public VertexView(int number, string Name)
+        {
+            Number = number;
+            this.Name = Name;
+        }
+        public VertexView(int number, string Name, bool IsVisited)
+        {
+            Number = number;
+            this.Name = Name;
+            this.IsVisited = IsVisited;
+        }
+        public static bool operator == (VertexView v1, VertexView v2)
+        {
+            return v1.Number == v2.Number;
+        }
+        public static bool operator != (VertexView v1, VertexView v2)
+        {
+            return v1.Number != v2.Number;
+        }
     }
 
     

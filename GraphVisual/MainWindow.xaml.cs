@@ -104,8 +104,83 @@ namespace GraphVisual
                 }
                 if (_selectedVertexs.Count == 2)
                 {
-                    AddNewEdgeWindow addNewEdgeWindow = new AddNewEdgeWindow();
-                    if (addNewEdgeWindow.ShowDialog() == true)
+                    AddNewEdgeWindow addNewEdgeWindow = null;
+                    if (_algmode != 2 && _algmode != 3)
+                    {
+                        addNewEdgeWindow = new AddNewEdgeWindow();
+                    }
+                    if (addNewEdgeWindow != null)
+                    {
+                        if (addNewEdgeWindow.ShowDialog() == true)
+                        {
+                            var V1 = _graph.GetVertexByNumber((int)_selectedVertexs[0].Tag);
+                            var V2 = _graph.GetVertexByNumber((int)_selectedVertexs[1].Tag);
+                            EdgeView edge = new EdgeView()
+                            {
+
+                                V1 = new VertexView() { Name = V1.Name, Number = V1.Number, X = V1.X, Y = V1.Y },
+                                V2 = new VertexView() { Name = V2.Name, Number = V2.Number, X = V2.X, Y = V2.Y },
+                                Distance = addNewEdgeWindow.Distance,
+                                IsOriented = addNewEdgeWindow.IsOriented
+                            };
+
+                            try
+                            {
+                                if (_algmode != 2 || _algmode != 3)
+                                {
+                                    _graph.AddEdge(edge);
+                                }
+                            }
+                            catch (Exception excp)
+                            {
+                                if (excp.Message == "Edge is already exists")
+                                {
+                                    foreach (var elps in _selectedVertexs)
+                                    {
+                                        elps.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                                    }
+                                    _selectedVertexs.Clear();
+                                    return;
+                                }
+                                else if (excp.Message == "Add new nonOriented edge")
+                                {
+                                    List<Line> linesToDelete = new List<Line>();
+                                    foreach (UIElement child in GraphCanvas.Children)
+                                    {
+                                        if (child is Line line)
+                                        {
+                                            int firstVertexNumber = int.Parse(line.Tag.ToString().Split()[0]);
+                                            int secondVertexNumber = int.Parse(line.Tag.ToString().Split()[1]);
+
+                                            if (firstVertexNumber == edge.V2.Number && secondVertexNumber == edge.V1.Number)
+                                            {
+                                                linesToDelete.Add(line);
+
+                                            }
+                                        }
+                                    }
+                                    foreach (var line in linesToDelete)
+                                    {
+                                        GraphCanvas.Children.Remove(line);
+                                    }
+                                    foreach (var elps in _selectedVertexs)
+                                    {
+                                        elps.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                                    }
+                                    _selectedVertexs.Clear();
+                                    RenderEdge(false, edge);
+                                    return;
+                                }
+                            }
+                            RenderEdge(addNewEdgeWindow.IsOriented, edge);
+                            foreach (var elps in _selectedVertexs)
+                            {
+                                elps.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
+                            }
+                            _selectedVertexs.Clear();
+                        }
+                    }
+                    else
                     {
                         var V1 = _graph.GetVertexByNumber((int)_selectedVertexs[0].Tag);
                         var V2 = _graph.GetVertexByNumber((int)_selectedVertexs[1].Tag);
@@ -114,64 +189,17 @@ namespace GraphVisual
 
                             V1 = new VertexView() { Name = V1.Name, Number = V1.Number, X = V1.X, Y = V1.Y },
                             V2 = new VertexView() { Name = V2.Name, Number = V2.Number, X = V2.X, Y = V2.Y },
-                            Distance = addNewEdgeWindow.Distance,
-                            IsOriented = addNewEdgeWindow.IsOriented
-                        };
 
-                        try
-                        {
-                            if (_algmode != 2 || _algmode != 3)
-                            {
-                                _graph.AddEdge(edge);
-                            }
-                        }
-                        catch(Exception excp)
-                        {
-                            if (excp.Message == "Edge is already exists")
-                            {
-                                foreach (var elps in _selectedVertexs)
-                                {
-                                    elps.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
-                                }
-                                _selectedVertexs.Clear();
-                                return;
-                            }
-                            else if(excp.Message == "Add new nonOriented edge")
-                            {
-                                List<Line> linesToDelete = new List<Line>();
-                                foreach (UIElement child in GraphCanvas.Children)
-                                {
-                                    if (child is Line line)
-                                    {
-                                        int firstVertexNumber = int.Parse(line.Tag.ToString().Split()[0]);
-                                        int secondVertexNumber = int.Parse(line.Tag.ToString().Split()[1]);
-                                        
-                                        if (firstVertexNumber == edge.V2.Number && secondVertexNumber == edge.V1.Number)
-                                        {
-                                            linesToDelete.Add(line);
-                                            
-                                        }
-                                    }
-                                }
-                                foreach (var line in linesToDelete)
-                                {
-                                    GraphCanvas.Children.Remove(line);
-                                }    
-                                foreach (var elps in _selectedVertexs)
-                                {
-                                    elps.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
-                                }
-                                _selectedVertexs.Clear();
-                                RenderEdge(false, edge);
-                                return;
-                            }
-                        }
-                        RenderEdge(addNewEdgeWindow.IsOriented, edge);
+                        };
+                        RenderEdge(false, edge);
                         foreach (var elps in _selectedVertexs)
                         {
                             elps.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 0));
                         }
                         _selectedVertexs.Clear();
+                    }
+                    {
+
                     }
                 }
             }
@@ -492,14 +520,17 @@ namespace GraphVisual
                 Math.Abs(pt2.X + pt1.X) / 2,
                 Math.Abs(pt2.Y + pt1.Y) / 2);
 
-            TextBlock textBlock = new TextBlock();
-            textBlock.Text = edge.Distance.ToString();
-            textBlock.FontSize = 15;
-            textBlock.Foreground = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-            Canvas.SetLeft(textBlock, pt5.X);
-            Canvas.SetTop(textBlock, pt5.Y);
-            textBlock.Tag = edge.V1.Number + " " + edge.V2.Number;
-            GraphCanvas.Children.Add(textBlock);
+            if (_algmode != 2 && _algmode != 3)
+            {
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = edge.Distance.ToString();
+                textBlock.FontSize = 15;
+                textBlock.Foreground = new SolidColorBrush(Color.FromRgb(0, 0, 0));
+                Canvas.SetLeft(textBlock, pt5.X);
+                Canvas.SetTop(textBlock, pt5.Y);
+                textBlock.Tag = edge.V1.Number + " " + edge.V2.Number;
+                GraphCanvas.Children.Add(textBlock);
+            }
         }
 
         private void RenderNonOrientedEdge(EdgeView edge)
@@ -537,14 +568,17 @@ namespace GraphVisual
                 Math.Abs(pt2.X + pt1.X) / 2,
                 Math.Abs(pt2.Y + pt1.Y) / 2);
 
-            TextBlock textBlock = new TextBlock();
-            textBlock.Text = edge.Distance.ToString();
-            textBlock.FontSize = 15;
-            textBlock.Foreground = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-            Canvas.SetLeft(textBlock, pt5.X);
-            Canvas.SetTop(textBlock, pt5.Y);
-            textBlock.Tag = edge.V1.Number + " " + edge.V2.Number;
-            GraphCanvas.Children.Add(textBlock);
+            if (_algmode != 2 && _algmode != 3)
+            {
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = edge.Distance.ToString();
+                textBlock.FontSize = 15;
+                textBlock.Foreground = new SolidColorBrush(Color.FromRgb(0, 0, 0));
+                Canvas.SetLeft(textBlock, pt5.X);
+                Canvas.SetTop(textBlock, pt5.Y);
+                textBlock.Tag = edge.V1.Number + " " + edge.V2.Number;
+                GraphCanvas.Children.Add(textBlock);
+            }
         }
 
         private void AddVertexButton_Click(object sender, RoutedEventArgs e)
@@ -803,7 +837,7 @@ namespace GraphVisual
                     else
                     {
                         bool rightAnswer = true;
-                        var answerEdges = _graph.AlgBoruvkaLearning().E;
+                        var answerGraphEdges = _graph.AlgBoruvka(GraphCanvas, true).Result.E;
                         List<EdgeView> userAnswer = new List<EdgeView>();
                         foreach (var element in GraphCanvas.Children)
                         {
@@ -819,11 +853,26 @@ namespace GraphVisual
 
                             }
                         }
-                        if (userAnswer.Count == answerEdges.Count)
+                        List<EdgeView> toAdd = new List<EdgeView>();
+                        foreach(var edge in userAnswer)
+                        {
+                            toAdd.Add(
+                                new EdgeView()
+                                { V1 = new VertexView() { Number = edge.V2.Number },
+                                  V2 = new VertexView() { Number = edge.V1.Number }
+                                }
+                                );
+                        }
+                        foreach(var edge in toAdd)
+                        {
+                            userAnswer.Add(edge);
+                        }
+                        if (userAnswer.Count == answerGraphEdges.Count)
                         {
                             foreach (var edge in userAnswer)
                             {
-                                if (!answerEdges.Contains(edge))
+                                //Исправить Contains(Не работает)
+                                if (!answerGraphEdges.Contains())
                                 {
                                     rightAnswer = false;
                                 }
@@ -872,7 +921,7 @@ namespace GraphVisual
                 }
                 else
                 {
-                    await _graph.AlgBoruvka(GraphCanvas);
+                    await _graph.AlgBoruvka(GraphCanvas, false);
                 }
             }
             else if (chooseAlgComboBox.SelectedIndex == 3)

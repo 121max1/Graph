@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -319,93 +317,120 @@ namespace GraphVisual
             }
             return toReturn;
         }
-        public Graph AlgBoruvkaLearning()
+        public IEnumerable<VertexView> DFSBoruvka(int v)
         {
-            Graph T = new Graph();
-            T.V = V;
-            while (T.FindRelatedComponents().Count() != 1)
+            Stack<VertexView> stack = new Stack<VertexView>();
+            List<VertexView> toReturn = new List<VertexView>();
+            VertexView visited = V.Where(x => x.Number == v).First();
+            stack.Push(visited);
+            toReturn.Add(visited);
+            SortedSet<VertexView> VisitedVertex = new SortedSet<VertexView>();
+            VisitedVertex.Add(visited);
+            while (stack.Count != 0)
             {
-                foreach (var relatedComponent in T.FindRelatedComponents())
+                VertexView s = stack.Pop();
+                if (!VisitedVertex.Contains(s))
                 {
-                    EdgeView minEdgeInRelatedComponent = FindMinEdgeInRelatedComponent(relatedComponent, FindEdgesInRalatedComponents(relatedComponent));
-                    if (minEdgeInRelatedComponent != null)
+                    toReturn.Add(s);
+                }
+                VisitedVertex.Add(s);
+                foreach (var vert in FindАdjacentVertexs(s.Number).OrderByDescending(x => x.Number))
+                {
+                    if (!VisitedVertex.Contains(vert))
                     {
-                        T.E.Add(minEdgeInRelatedComponent);
+                        stack.Push(vert);
+                        vert.IsVisited = true;
                     }
                 }
             }
-            return T;
+            return toReturn;
         }
-        public async Task<Graph> AlgBoruvka(Canvas graphCanvas)
+        public async Task<Graph> AlgBoruvka(Canvas graphCanvas, bool isLearnignMode)
         {
             Graph T = new Graph();
             T.V = V;
-            foreach (UIElement elem in graphCanvas.Children)
+            if (!isLearnignMode)
             {
-                if (elem is Line line)
+                foreach (UIElement elem in graphCanvas.Children)
                 {
-
-                    line.Visibility = Visibility.Hidden;
-                }
-                else if (elem is TextBlock text)
-                {
-                    if (text.Tag.ToString().Split().Length == 2)
+                    if (elem is Line line)
                     {
 
-                        text.Visibility = Visibility.Hidden;
+                        line.Visibility = Visibility.Hidden;
                     }
-                }
+                    else if (elem is TextBlock text)
+                    {
+                        if (text.Tag.ToString().Split().Length == 2)
+                        {
 
+                            text.Visibility = Visibility.Hidden;
+                        }
+                    }
+
+                }
             }
             while (T.FindRelatedComponents().Count() != 1)
             {
                 List<UIElement> linesToDraw = new List<UIElement>();
-                foreach (var relatedComponent in T.FindRelatedComponents())
+                var components = T.FindRelatedComponents();
+                foreach (var relatedComponent in components)
                 {
                     EdgeView minEdgeInRelatedComponent = FindMinEdgeInRelatedComponent(relatedComponent, FindEdgesInRalatedComponents(relatedComponent));
+
                     if (minEdgeInRelatedComponent != null)
                     {
-                        foreach (UIElement elem in graphCanvas.Children)
+                        if (!isLearnignMode)
                         {
-                            if (elem is Line line)
+                            foreach (UIElement elem in graphCanvas.Children)
                             {
-                                int v1 = int.Parse(line.Tag.ToString().Split()[0]);
-                                int v2 = int.Parse(line.Tag.ToString().Split()[1]);
-                                if (minEdgeInRelatedComponent.V1.Number == v1 && minEdgeInRelatedComponent.V2.Number == v2 ||
-                                    minEdgeInRelatedComponent.V2.Number == v1 && minEdgeInRelatedComponent.V1.Number == v2)
+                                if (elem is Line line)
                                 {
-                                    linesToDraw.Add(line);
-                                }
-                            }
-                            else if (elem is TextBlock text)
-                            {
-                                if (text.Tag.ToString().Split().Length == 2)
-                                {
-                                    int v1 = int.Parse(text.Tag.ToString().Split()[0]);
-                                    int v2 = int.Parse(text.Tag.ToString().Split()[1]);
+                                    int v1 = int.Parse(line.Tag.ToString().Split()[0]);
+                                    int v2 = int.Parse(line.Tag.ToString().Split()[1]);
                                     if (minEdgeInRelatedComponent.V1.Number == v1 && minEdgeInRelatedComponent.V2.Number == v2 ||
                                         minEdgeInRelatedComponent.V2.Number == v1 && minEdgeInRelatedComponent.V1.Number == v2)
                                     {
-                                        linesToDraw.Add(text);
+                                        linesToDraw.Add(line);
                                     }
                                 }
-                            }
+                                else if (elem is TextBlock text)
+                                {
+                                    if (text.Tag.ToString().Split().Length == 2)
+                                    {
+                                        int v1 = int.Parse(text.Tag.ToString().Split()[0]);
+                                        int v2 = int.Parse(text.Tag.ToString().Split()[1]);
+                                        if (minEdgeInRelatedComponent.V1.Number == v1 && minEdgeInRelatedComponent.V2.Number == v2 ||
+                                            minEdgeInRelatedComponent.V2.Number == v1 && minEdgeInRelatedComponent.V1.Number == v2)
+                                        {
+                                            linesToDraw.Add(text);
+                                        }
+                                    }
+                                }
 
+                            }
                         }
                         T.E.Add(minEdgeInRelatedComponent);
                     }
+
                 }
 
-                await Task.Delay(2000);
-                foreach(var line in linesToDraw)
+                if (!isLearnignMode)
                 {
-                  
-                    line.Visibility = Visibility.Visible;
+                    await Task.Delay(2000);
+                    foreach (var line in linesToDraw)
+                    {
+
+                        line.Visibility = Visibility.Visible;
+                    }
                 }
 
             }
             return T;
         }
+            
+        
+
+        
         public IEnumerable<EdgeView> FindEdgesInRalatedComponents(IEnumerable<VertexView> component)
         {
             List<EdgeView> toReturn = new List<EdgeView>();
@@ -447,11 +472,11 @@ namespace GraphVisual
         public IEnumerable<IEnumerable<VertexView>> FindRelatedComponents()
         {
             List<VertexView> relations = new List<VertexView>();
-            V.ToList().ForEach(item => relations.Add(new VertexView() {Name=item.Name, Number = item.Number, X = item.X, Y = item.Y }));
+            V.ToList().ForEach(item => relations.Add(new VertexView(item.Number, item.Name)));
             while (relations.Count != 0)
             {
                 List<VertexView> comp = new List<VertexView>();
-                foreach (var v in DFS(relations.First()))
+                foreach (var v in DFSBoruvka(relations.First().Number))
                 {
                     comp.Add(v);
                 }

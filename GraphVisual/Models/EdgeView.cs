@@ -16,6 +16,16 @@ namespace GraphVisual.Models
 
         public bool? IsOriented {get;set;}
 
+        public EdgeView()
+        {
+
+        }
+        public EdgeView(VertexView v1, VertexView v2, int distance)
+        {
+            V1 = v1;
+            V2 = v2;
+            Distance = distance;
+        }
         public bool Equals(EdgeView other)
         {
             if (other is null)
