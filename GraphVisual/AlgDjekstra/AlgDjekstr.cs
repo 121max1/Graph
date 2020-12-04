@@ -20,10 +20,10 @@ namespace Graph.AlgDjekstra
 
         static public Canvas grCanvas { get; set; }
 
-        static private Dictionary<VertexView, int> _distances;
+        static private SortedDictionary<VertexView, int> _distances;
         public AlgDjekstr(GraphVisual.Graph g)
         {
-            _distances = new Dictionary<VertexView, int>();
+            _distances = new SortedDictionary<VertexView, int>();
 
 
             foreach (var edge in g.E)
@@ -36,10 +36,10 @@ namespace Graph.AlgDjekstra
             }
         }
 
-        public async static Task<Dictionary<VertexView, int>> AlgDjekstra(int startVert, GraphVisual.Graph g, Canvas graphCanvas)
+        public async static Task<SortedDictionary<VertexView, int>> AlgDjekstra(int startVert, GraphVisual.Graph g, Canvas graphCanvas, bool isLearingMode)
         {
             VertexView startVertex = g.V.Where(item => item.Number == startVert).First();
-;            _distances = new Dictionary<VertexView, int>();
+;            _distances = new SortedDictionary<VertexView, int>();
             Edges = new List<EdgeDjekstra>();
             Vertices = new List<VertexDjekstra>();
             grCanvas = graphCanvas;
@@ -52,39 +52,17 @@ namespace Graph.AlgDjekstra
                 Vertices.Add(new VertexDjekstra(vertex));
             }
             VertexDjekstra firstVertex = Vertices.Where(item => item.Number == startVertex.Number).First();
-            //firstVertex.IsVisited = true;
             firstVertex.CurrentMark = 0;
-            /*
-            _distances.Add(startVertex, 0);
-            foreach(var element in grCanvas.Children)
-            {
-                if(element is TextBlock text)
-                {
-                    if(text.Tag.ToString().Split().Length==2)
-                    {
-                        if (text.Tag.ToString().Split()[1] == "Dj")
-                        {
-                            int vertexNum = int.Parse(text.Tag.ToString().Split()[0]);
-                            if (vertexNum == startVertex.Number)
-                            {
-                                text.Text = "0";
-                                text.Foreground = new SolidColorBrush(Color.FromRgb(0, 140, 0));
-                            }
-                        }
-                    }
-                }
-            }    
-            */
-            await FindMinWays(firstVertex);
+            await FindMinWays(firstVertex, isLearingMode);
             return _distances;
         }
 
-        static private async Task FindMinWays(VertexDjekstra vertex)
+        static private async Task FindMinWays(VertexDjekstra vertex, bool isLearingMode)
         {
             if (Vertices.Where(item => item.IsVisited != true).Count() != 0)
             {
-                VertexDjekstra next = await MakeStep(vertex);
-                await FindMinWays(next);
+                VertexDjekstra next = await MakeStep(vertex, isLearingMode);
+                await FindMinWays(next, isLearingMode);
             }
         }
         static private  IEnumerable<VertexDjekstra> FindАdjacentVertexs(VertexDjekstra vertex)
@@ -108,58 +86,64 @@ namespace Graph.AlgDjekstra
             return Edges.Where(item => item.V1.Number == v1.Number && item.V2.Number == v2.Number).FirstOrDefault();
         }
 
-        private static async Task< VertexDjekstra> MakeStep(VertexDjekstra vertex)
+        private static async Task< VertexDjekstra> MakeStep(VertexDjekstra vertex, bool isLearingMode)
         {
             foreach(var v in FindАdjacentVertexs(vertex))
             {
                 var vert = Vertices.Where(x=>x.Number==v.Number).FirstOrDefault();
                 int CurrentMark = Math.Min(vert.CurrentMark, vertex.CurrentMark + FindEdge(vertex, vert).Distance);
                 Vertices.Where(x => x.Number == vert.Number).FirstOrDefault().CurrentMark = CurrentMark;
-                await Task.Delay(1000);
-                foreach (var element in grCanvas.Children)
+                if (isLearingMode == false)
                 {
-                    if (element is Line line)
+                    await Task.Delay(1000);
+                    foreach (var element in grCanvas.Children)
                     {
-                        int v1 = int.Parse(line.Tag.ToString().Split()[0]);
-                        int v2 = int.Parse(line.Tag.ToString().Split()[1]);
-                        if (vertex.Number == v1 && v.Number == v2)
+                        if (element is Line line)
                         {
-                            line.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 140));
+                            int v1 = int.Parse(line.Tag.ToString().Split()[0]);
+                            int v2 = int.Parse(line.Tag.ToString().Split()[1]);
+                            if (vertex.Number == v1 && v.Number == v2)
+                            {
+                                line.Stroke = new SolidColorBrush(Color.FromRgb(140, 0, 140));
+                            }
+                        }
+                        else if (element is TextBlock text)
+                        {
+                            if (text.Tag.ToString().Split().Length == 2)
+                            {
+                                if (text.Tag.ToString().Split()[1] == "Dj")
+                                {
+                                    int vertexNum = int.Parse(text.Tag.ToString().Split()[0]);
+                                    if (vertexNum == v.Number)
+                                    {
+                                        text.Text = CurrentMark.ToString();
+                                    }
+                                }
+                            }
                         }
                     }
-                    else if (element is TextBlock text)
+                }
+           }
+            int min_dist = Vertices.Where(item => item.IsVisited!=true).Select(item => item.CurrentMark).Min();
+            VertexDjekstra min_vert = Vertices.Where(item => item.IsVisited != true && item.CurrentMark == min_dist).First();
+            Vertices.Where(item => item.IsVisited != true && item.CurrentMark == min_dist).First().IsVisited = true;
+            _distances.Add(min_vert, min_dist);
+            if (isLearingMode == false)
+            {
+                foreach (var element in grCanvas.Children)
+                {
+                    if (element is TextBlock text)
                     {
                         if (text.Tag.ToString().Split().Length == 2)
                         {
                             if (text.Tag.ToString().Split()[1] == "Dj")
                             {
                                 int vertexNum = int.Parse(text.Tag.ToString().Split()[0]);
-                                if (vertexNum == v.Number)
+                                if (vertexNum == min_vert.Number)
                                 {
-                                    text.Text = CurrentMark.ToString();
+                                    text.Text = min_dist.ToString();
+                                    text.Foreground = new SolidColorBrush(Color.FromRgb(0, 140, 0));
                                 }
-                            }
-                        }
-                    }
-                }     
-           }
-            int min_dist = Vertices.Where(item => item.IsVisited!=true).Select(item => item.CurrentMark).Min();
-            VertexDjekstra min_vert = Vertices.Where(item => item.IsVisited != true && item.CurrentMark == min_dist).First();
-            Vertices.Where(item => item.IsVisited != true && item.CurrentMark == min_dist).First().IsVisited = true;
-            _distances.Add(min_vert, min_dist);
-            foreach (var element in grCanvas.Children)
-            {
-                if (element is TextBlock text)
-                {
-                    if (text.Tag.ToString().Split().Length == 2)
-                    {
-                        if (text.Tag.ToString().Split()[1] == "Dj")
-                        {
-                            int vertexNum = int.Parse(text.Tag.ToString().Split()[0]);
-                            if (vertexNum == min_vert.Number)
-                            {
-                                text.Text = min_dist.ToString();
-                                text.Foreground = new SolidColorBrush(Color.FromRgb(0, 140, 0));
                             }
                         }
                     }

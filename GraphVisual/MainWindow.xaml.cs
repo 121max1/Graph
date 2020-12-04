@@ -32,11 +32,12 @@ namespace GraphVisual
         private List<Ellipse> _selectedVertexsForAlg = new List<Ellipse>();
         private List<Ellipse> _selectedVertexs = new List<Ellipse>();
         private List<Line> _linesOnCanvas = new List<Line>();
+        private List<UIElement> graphVisualChildren = new List<UIElement>();
         private readonly Graph _graph = new Graph();
         private List<Ellipse> _selectedVertexsToColorEdge = new List<Ellipse>();
         private int _algmode = 1;
         private int _buttonStartClickCount = 0;
-
+        private SortedDictionary<VertexView, int> _userDjekstraAnswer = new SortedDictionary<VertexView, int>();
         enum AlgMode
         {
             DFS,
@@ -239,7 +240,7 @@ namespace GraphVisual
                 {
                     if (vert != null)
                     {
-                        if (!_selectedVertexsForAlg.Contains(vert))
+                        if (!_selectedVertexsForAlg.Contains(vert) && (_algmode == 0 || _algmode == 1))
                         {
                             _selectedVertexsForAlg.Add(vert);
                             if(_selectedVertexsToColorEdge.Count<2)
@@ -676,7 +677,8 @@ namespace GraphVisual
 
         private async void StartAlgorithmButton_Click(object sender, RoutedEventArgs e)
         {
-            if(_learningMode == true && (_algmode == 2 || _algmode == 3))
+            
+            if (_learningMode == true && (_algmode == 2 || _algmode == 3))
             {
                 _buttonStartClickCount+=1;
             }
@@ -817,7 +819,6 @@ namespace GraphVisual
             {
                 if (_learningMode == true)
                 {
-                    List<UIElement> graphVisualChildren = new List<UIElement>();
                     if (_buttonStartClickCount == 1)
                     {
                         List<UIElement> toRemove = new List<UIElement>();
@@ -871,12 +872,16 @@ namespace GraphVisual
                         {
                             foreach (var edge in userAnswer)
                             {
-                                //Исправить Contains(Не работает)
-                                if (!answerGraphEdges.Contains())
+                                bool IsThere = false;
+                                foreach(var answerEdge in answerGraphEdges)
+                                if (edge.V1.Number == answerEdge.V1.Number && edge.V2.Number == answerEdge.V2.Number)
+                                {
+                                        IsThere = true;
+                                }
+                                if(IsThere == false)
                                 {
                                     rightAnswer = false;
                                 }
-
                             }
                         }
                         else
@@ -926,20 +931,102 @@ namespace GraphVisual
             }
             else if (chooseAlgComboBox.SelectedIndex == 3)
             {
-                if (_selectedVertex != null)
+                
+                if (_selectedVertex != null) 
                 {
                     AddTextBlocksForDjekstra();
-                    foreach (var pair in await AlgDjekstr.AlgDjekstra((int)_selectedVertex.Tag, _graph, GraphCanvas))
+                    if (_learningMode == true)
                     {
-                        textBoxAnswer.Text += pair.Key.Name + "-" + pair.Value.ToString() + "\n";
+                        bool rightAnswer = true;
+                        if (_buttonStartClickCount == 1)
+                        {
+                            foreach (var child in GraphCanvas.Children)
+                            {
+                                if (child is TextBlock text)
+                                {
+                                    if (text.Tag.ToString().Split().Length == 2)
+                                    {
+                                        text.MouseLeftButtonDown += Text_MouseLeftButtonDown;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var compAnswer = await AlgDjekstr.AlgDjekstra((int)_selectedVertex.Tag, _graph, GraphCanvas, true);
+                            if (compAnswer.Count == _userDjekstraAnswer.Count)
+                            {
+                                foreach (var vertUser in _userDjekstraAnswer)
+                                {
+                                    bool IsThere = true;
+                                    foreach (var answerVert in compAnswer)
+                                        if (vertUser.Key == answerVert.Key && vertUser.Value != answerVert.Value)
+                                        {
+                                            rightAnswer = false;
+                                        }
+                                    if (IsThere == false)
+                                    {
+                                        rightAnswer = false;
+                                    }
+                                }
+                                if (rightAnswer == true)
+                                {
+
+                                    MessageBox.Show(
+                                    "Задание решено верно",
+                                    "Сообщение",
+                                     MessageBoxButton.OK
+
+                                    );
+                                }
+                                else
+                                {
+                                    MessageBox.Show(
+                                           "Задание решено неверно",
+                                           "Сообщение",
+                                            MessageBoxButton.OK
+                                            );
+                                }
+                                
+
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (var pair in await AlgDjekstr.AlgDjekstra((int)_selectedVertex.Tag, _graph, GraphCanvas, false))
+                        {
+                            textBoxAnswer.Text += pair.Key.Name + "-" + pair.Value.ToString() + "\n";
+                        }
                     }
                 }
             }
 
 
         }
-    
 
+        private void Text_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            TextBlock text = sender as TextBlock;
+            ChangeMarkWindow changeMarkWindow = new ChangeMarkWindow();
+            changeMarkWindow.markValueTextBlock.Text = text.Text;
+            if (changeMarkWindow.ShowDialog() == true)
+            {
+                if (changeMarkWindow.isToSubmitMark == false)
+                {
+                    text.Text = changeMarkWindow.markValueTextBlock.Text;
+                }
+                else
+                {
+                    text.Text = changeMarkWindow.markValueTextBlock.Text;
+                    text.Foreground = new SolidColorBrush(Color.FromRgb(0, 140, 0));
+                    _userDjekstraAnswer.Add(new VertexView(int.Parse(text.Tag.ToString().Split()[0]), 
+                        text.Tag.ToString().Split()[0]), int.Parse(text.Text));
+
+                }
+            }
+        }
+        
         private void Reset_Click(object sender, RoutedEventArgs e)
         {
             List<UIElement> toRemove = new List<UIElement>();
