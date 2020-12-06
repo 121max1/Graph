@@ -2,6 +2,7 @@
 using GraphVisual.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ namespace GraphVisual
         private List<Ellipse> _selectedVertexs = new List<Ellipse>();
         private List<Line> _linesOnCanvas = new List<Line>();
         private List<UIElement> graphVisualChildren = new List<UIElement>();
-        private readonly Graph _graph = new Graph();
+        private Graph _graph = new Graph();
         private List<Ellipse> _selectedVertexsToColorEdge = new List<Ellipse>();
         private int _algmode = 1;
         private int _buttonStartClickCount = 0;
@@ -1087,7 +1088,88 @@ namespace GraphVisual
             
         }
 
-     
+        private void ReadAndSetGrapg(string filePath)
+        {
+            List<VertexView> vertices = new List<VertexView>();
+            List<EdgeView> edges = new List<EdgeView>();
+            int n;
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                n = int.Parse(reader.ReadLine());
+                for (int i = 0; i < n; i++)
+                {
+                    string[] vertexString = reader.ReadLine().Split();
+                    vertices.Add(new VertexView()
+                    {
+                        IsVisited = false,
+                        Name = vertexString[0],
+                        Number = int.Parse(vertexString[1]),
+                        X = double.Parse(vertexString[2]),
+                        Y = double.Parse(vertexString[3])
+                    });
+                }
+                n = int.Parse(reader.ReadLine());
+                for (int i = 0; i < n; i++)
+                {
+                    string[] edgesString = reader.ReadLine().Split();
+                    VertexView v1 = vertices.Where(item => item.Number == int.Parse(edgesString[0])).FirstOrDefault();
+                    VertexView v2 = vertices.Where(item => item.Number == int.Parse(edgesString[1])).FirstOrDefault();
+                    bool? isOriented;
+                    if (edgesString[3] == "0")
+                    {
+                        isOriented = false;
+                    }
+                    else
+                    {
+                        isOriented = true;
+                    }
+                    edges.Add(new EdgeView()
+                    {
+                        V1 = v1,
+                        V2 = v2,
+                        Distance = int.Parse(edgesString[2]),
+                        IsOriented = isOriented
+                    });
+                }
+            }
+            
+            foreach (var vertex in vertices)
+            {
+                _graph.AddVertex(vertex);
+                RenderVertex(vertex, Color.FromRgb(140, 0, 0));
+            }
+            foreach(var edge in edges)
+            {
+                _graph.AddEdge(edge);
+                RenderEdge(edge.IsOriented, edge);
+            }
+            
+            
+        }
+        private void GraphExample1Button_Click(object sender, RoutedEventArgs e)
+        {
+            GraphCanvas.Children.Clear();
+            _graph = null;
+            _graph = new Graph();
+            ReadAndSetGrapg("Resources/GraphExample1.txt");
+            
+        }
+
+        private void GraphExample2Button_Click(object sender, RoutedEventArgs e)
+        {
+            GraphCanvas.Children.Clear();
+            _graph = null;
+            _graph = new Graph();
+            ReadAndSetGrapg("Resources/GraphExample2.txt");
+        }
+
+        private void GraphExample3Button_Click(object sender, RoutedEventArgs e)
+        {
+            GraphCanvas.Children.Clear();
+            _graph = null;
+            _graph = new Graph();
+            ReadAndSetGrapg("Resources/GraphExample3.txt");
+        }
     }
 }
 
