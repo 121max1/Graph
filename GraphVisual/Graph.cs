@@ -61,17 +61,20 @@ namespace GraphVisual
                     break;
                 }
             }
-            if(edgeToDelete.IsOriented == false)
+            if (edgeToDelete != null)
             {
-                foreach (var edge in E)
+                if (edgeToDelete.IsOriented == false)
                 {
-                    if (edge.V1.Number == v2 && edge.V2.Number == v1)
+                    foreach (var edge in E)
                     {
-                        E.Remove(edge);
-                        break;
+                        if (edge.V1.Number == v2 && edge.V2.Number == v1)
+                        {
+                            E.Remove(edge);
+                            break;
+                        }
                     }
                 }
-            }    
+            }
         }
         public void AddEdge(EdgeView edge)
         {

@@ -137,5 +137,14 @@
   <ItemGroup>
     <Resource Include="Resources\SelectVertexImage.jpg" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\GraphExample1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\GraphExample2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\GraphExample3.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -38,6 +38,7 @@ namespace GraphVisual
         private int _algmode = 1;
         private int _buttonStartClickCount = 0;
         private SortedDictionary<VertexView, int> _userDjekstraAnswer = new SortedDictionary<VertexView, int>();
+        private bool _isBoruvkaProcessed = false;
         enum AlgMode
         {
             DFS,
@@ -106,7 +107,7 @@ namespace GraphVisual
                 if (_selectedVertexs.Count == 2)
                 {
                     AddNewEdgeWindow addNewEdgeWindow = null;
-                    if (_algmode != 2 && _algmode != 3)
+                    if (_isBoruvkaProcessed == false)
                     {
                         addNewEdgeWindow = new AddNewEdgeWindow();
                     }
@@ -127,7 +128,7 @@ namespace GraphVisual
 
                             try
                             {
-                                if (_algmode != 2 || _algmode != 3)
+                                if (_isBoruvkaProcessed == false)
                                 {
                                     _graph.AddEdge(edge);
                                 }
@@ -521,7 +522,7 @@ namespace GraphVisual
                 Math.Abs(pt2.X + pt1.X) / 2,
                 Math.Abs(pt2.Y + pt1.Y) / 2);
 
-            if (_algmode != 2 && _algmode != 3)
+            if (_isBoruvkaProcessed == false)
             {
                 TextBlock textBlock = new TextBlock();
                 textBlock.Text = edge.Distance.ToString();
@@ -569,7 +570,7 @@ namespace GraphVisual
                 Math.Abs(pt2.X + pt1.X) / 2,
                 Math.Abs(pt2.Y + pt1.Y) / 2);
 
-            if (_algmode != 2 && _algmode != 3)
+            if (_isBoruvkaProcessed == false)
             {
                 TextBlock textBlock = new TextBlock();
                 textBlock.Text = edge.Distance.ToString();
@@ -834,6 +835,7 @@ namespace GraphVisual
                         {
                             GraphCanvas.Children.Remove(line);
                         }
+                        _isBoruvkaProcessed = true;
                     }
                     else
                     {
@@ -907,6 +909,7 @@ namespace GraphVisual
                                     MessageBoxButton.OK
                                     );
                         }
+                        _isBoruvkaProcessed = false;
                         _buttonStartClickCount = 0;
                         List<UIElement> toDelete = new List<UIElement>();
                         foreach (UIElement element in GraphCanvas.Children)
@@ -934,12 +937,12 @@ namespace GraphVisual
                 
                 if (_selectedVertex != null) 
                 {
-                    AddTextBlocksForDjekstra();
                     if (_learningMode == true)
                     {
                         bool rightAnswer = true;
                         if (_buttonStartClickCount == 1)
                         {
+                            AddTextBlocksForDjekstra();
                             foreach (var child in GraphCanvas.Children)
                             {
                                 if (child is TextBlock text)
@@ -994,11 +997,12 @@ namespace GraphVisual
                     }
                     else
                     {
+                        AddTextBlocksForDjekstra();
                         foreach (var pair in await AlgDjekstr.AlgDjekstra((int)_selectedVertex.Tag, _graph, GraphCanvas, false))
                         {
                             textBoxAnswer.Text += pair.Key.Name + "-" + pair.Value.ToString() + "\n";
                         }
-                    }
+                    }                  
                 }
             }
 
@@ -1082,6 +1086,8 @@ namespace GraphVisual
             } 
             
         }
+
+     
     }
 }
 
