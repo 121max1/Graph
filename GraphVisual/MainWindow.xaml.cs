@@ -1151,7 +1151,7 @@ namespace GraphVisual
             GraphCanvas.Children.Clear();
             _graph = null;
             _graph = new Graph();
-            ReadAndSetGrapg("Resources/GraphExample1.txt");
+            ReadAndSetGrapg(@"..\..\Resources\GraphExample1.txt");
             
         }
 
@@ -1160,7 +1160,7 @@ namespace GraphVisual
             GraphCanvas.Children.Clear();
             _graph = null;
             _graph = new Graph();
-            ReadAndSetGrapg("Resources/GraphExample2.txt");
+            ReadAndSetGrapg(@"..\..\Resources\GraphExample2.txt");
         }
 
         private void GraphExample3Button_Click(object sender, RoutedEventArgs e)
@@ -1168,7 +1168,7 @@ namespace GraphVisual
             GraphCanvas.Children.Clear();
             _graph = null;
             _graph = new Graph();
-            ReadAndSetGrapg("Resources/GraphExample3.txt");
+            ReadAndSetGrapg(@"..\..\Resources\GraphExample3.txt");
         }
     }
 }
