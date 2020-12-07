@@ -1,5 +1,6 @@
 ﻿using Graph.AlgDjekstra;
 using GraphVisual.Models;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -1169,6 +1170,104 @@ namespace GraphVisual
             _graph = null;
             _graph = new Graph();
             ReadAndSetGrapg(@"..\..\Resources\GraphExample3.txt");
+        }
+
+        private void SaveGraphButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog= new SaveFileDialog();
+            if(saveFileDialog.ShowDialog() == true)
+            {
+                string filePath = saveFileDialog.FileName;
+                SaveGraphInFile(filePath);
+            }
+
+        }
+        private void SaveGraphInFile(string fileName)
+        {
+            using(StreamWriter writer = new StreamWriter(fileName))
+            {
+                writer.WriteLine(_graph.V.Count);
+                foreach(var vertex in _graph.V)
+                {
+                    writer.WriteLine(vertex.Name + " " + vertex.Number + " " + vertex.X + " " + vertex.Y);
+                }
+                List<EdgeView> toPrint = new List<EdgeView>();
+                //foreach(var edge in _graph.E)
+                //{
+                //    toPrint.Add(edge);
+                //}
+                List<EdgeView> passedEdges = new List<EdgeView>();
+                foreach(var edge in _graph.E)
+                {
+                    var reversedEdge = toPrint.Where(item => item.V1.Number == edge.V2.Number
+                    && item.V2.Number == edge.V1.Number).FirstOrDefault();
+                    if (!passedEdges.Contains(edge) && !passedEdges.Contains(reversedEdge))
+                    {
+                        edge.IsOriented = false;
+                        if(reversedEdge == null)
+                        {
+                            edge.IsOriented = true;
+                        }
+                        toPrint.Add(edge);
+                        passedEdges.Add(edge);
+                        if(reversedEdge!=null)
+                        {
+                            passedEdges.Add(reversedEdge);
+                        }
+                    }
+                }
+                writer.WriteLine(toPrint.Count);
+                foreach(var edge in toPrint)
+                {
+                    writer.WriteLine(edge.V1.Name + " " + edge.V2.Name + " " + edge.Distance + " " + (edge.IsOriented == true ? "0" : "1"));
+                } 
+            }
+        }
+        private void LoadGraphButton_Click(object sender, RoutedEventArgs e)
+        {
+            GraphCanvas.Children.Clear();
+            _graph = null;
+            _graph = new Graph();
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string filePath = openFileDialog.FileName;
+                ReadAndSetGrapg(filePath);
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void InformationButton_Click(object sender, RoutedEventArgs e)
+        {
+            string message = "Формат входных данных:\n" +
+                             "<Колличество вершин>\n" +
+                             "<Название вершины> <Номер вершины> <X координата> <Y координата> \n" +
+                             "... \n\n" +
+                             "Количество ребер\n" +
+                             "<Первая вершина> <Вторая вершина> <Расстояние> <Ориентрированность(0/1)> \n" +
+                             "... \n\n" +
+                             "Цвета:\n" +
+                             "красный - стандартный;\n" +
+                             "зеленый - выбранная вершина для алгоритма;\n" +
+                             "синий - выбранная вершна при соединении ребер;\n" +
+                             "серо-зеленый - пройденная вершина в алгоритмах обхода.\n\n" +
+                             "Алгоритм обхода в глубину и ширину:\n"+
+                             "Обычный режим:\n"+
+                             "1. Выберите вершину\n" +
+                             "2. Выберите алгоритм\n" +
+                             "3. Нажмите кнопку выполнить\n"+
+                             "Обучаюший режим:\n" +
+                             "1. Выберите алгоритм\n" +
+                             "2. Выберите вершины\n" +
+                             "3. Нажмите кнопку выполнить\n" +
+                             "... \n\n" +
+                             "Приложение сделал студент 341 группы Шкодин Максим (2020).\n";
+                              
+            MessageBox.Show(message, "Справка", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

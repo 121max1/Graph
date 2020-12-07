@@ -49,8 +49,8 @@
         <RadioButton Content="Обучающий" HorizontalAlignment="Left" Margin="1029,51,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked_1" FontSize="14" Width="101"/>
         <RadioButton Content="Обычный" HorizontalAlignment="Left" Margin="1029,72,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked" FontSize="14" Width="83" IsChecked="True"/>
         <Button Name ="StartAlgorithmButton" Content="Запустить" Margin="1029,152,23,0" VerticalAlignment="Top" FontSize="14" Click="StartAlgorithmButton_Click"/>
-        <Label Content="Текстовый ответ:" HorizontalAlignment="Left" Margin="1028,198,0,0" VerticalAlignment="Top" Width="124" FontSize="14"/>
-        <TextBox Name = "textBoxAnswer" Height="233" Margin="1030,225,24,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.242,-3"/>
+        <Label Content="Текстовый ответ:" HorizontalAlignment="Left" Margin="1030,260,0,0" VerticalAlignment="Top" Width="124" FontSize="14"/>
+        <TextBox Name = "textBoxAnswer" Height="164" Margin="1030,294,24,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.242,-3"/>
         <Button x:Name ="Reset" Content="Очистить" Margin="1029,180,23,0" VerticalAlignment="Top" FontSize="14" Click="Reset_Click"/>
         <Button Name ="GraphExample1Button" HorizontalAlignment="Left" Margin="88,463,0,0" VerticalAlignment="Top" Width="274" Height="177" Click="GraphExample1Button_Click">
             <Image Source = "Resources/GraphExample1.png" Stretch="Fill"/>
@@ -61,6 +61,9 @@
         <Button Name ="GraphExample3Button"  HorizontalAlignment="Left" Margin="737,463,0,0" VerticalAlignment="Top" Width="274" Height="177" Click="GraphExample3Button_Click">
             <Image Source="Resources/GraphExample3.png" Stretch="Fill"/>
         </Button>
+        <Button x:Name ="SaveGraphButton" Content="Сохранить" Margin="1030,208,22,0" VerticalAlignment="Top" FontSize="14" Click="SaveGraphButton_Click"/>
+        <Button x:Name ="LoadGraphButton" Content="Загрузить" Margin="1030,236,22,0" VerticalAlignment="Top" FontSize="14" Click="LoadGraphButton_Click"/>
+        <Button Name ="InformationButton" Content="Справка" HorizontalAlignment="Left" Margin="1135,4,0,0" VerticalAlignment="Top" Width="75" Click="InformationButton_Click"/>
     </Grid>
 
 </Window>
